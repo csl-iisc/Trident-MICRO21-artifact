@@ -64,7 +64,7 @@ prepare_paths_virtual()
             exit
         fi
         # where to put the output file (based on CONFIG)
-        DATADIR=$ROOT"/data/experiments/$BENCHMARK"
+        DATADIR=$ROOT"/evaluation/$BENCHMARK"
         RUNDIR=$DATADIR/$(hostname)-$BENCHMARK-$CONFIG-$CONFIG-$(date +"%Y%m%d-%H%M%S")
         mkdir -p $RUNDIR
         if [ $? -ne 0 ]; then
@@ -92,7 +92,7 @@ prepare_paths()
             exit
         fi
         # where to put the output file (based on CONFIG)
-        DATADIR=$ROOT"/data/experiments/$BENCHMARK"
+        DATADIR=$ROOT"/evaluation/$BENCHMARK"
         RUNDIR=$DATADIR/$(hostname)-$BENCHMARK-$CONFIG-$(date +"%Y%m%d-%H%M%S")
         mkdir -p $RUNDIR
         if [ $? -ne 0 ]; then
