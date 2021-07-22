@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<domain type="kvm">
+  <name>trident</name>
+  <uuid>f8a03c5c-bea1-4fcf-b5c2-a4e13a3571cb</uuid>
+  <memory unit="KiB">146800640</memory>
+  <memoryBacking>
+    <hugepages>
+      <page size="1048576" unit="KiB"/>
+    </hugepages>
+  </memoryBacking>
+  <currentMemory unit="KiB">146800640</currentMemory>
+  <vcpu placement="static">24</vcpu>
+  <cputune>
+    <vcpupin cpuset="12" vcpu="0"/>
+    <vcpupin cpuset="13" vcpu="1"/>
+    <vcpupin cpuset="14" vcpu="2"/>
+    <vcpupin cpuset="15" vcpu="3"/>
+    <vcpupin cpuset="16" vcpu="4"/>
+    <vcpupin cpuset="17" vcpu="5"/>
+    <vcpupin cpuset="18" vcpu="6"/>
+    <vcpupin cpuset="19" vcpu="7"/>
+    <vcpupin cpuset="20" vcpu="8"/>
+    <vcpupin cpuset="21" vcpu="9"/>
+    <vcpupin cpuset="22" vcpu="10"/>
+    <vcpupin cpuset="23" vcpu="11"/>
+    <vcpupin cpuset="36" vcpu="12"/>
+    <vcpupin cpuset="37" vcpu="13"/>
+    <vcpupin cpuset="38" vcpu="14"/>
+    <vcpupin cpuset="39" vcpu="15"/>
+    <vcpupin cpuset="40" vcpu="16"/>
+    <vcpupin cpuset="41" vcpu="17"/>
+    <vcpupin cpuset="42" vcpu="18"/>
+    <vcpupin cpuset="43" vcpu="19"/>
+    <vcpupin cpuset="44" vcpu="20"/>
+    <vcpupin cpuset="45" vcpu="21"/>
+    <vcpupin cpuset="46" vcpu="22"/>
+    <vcpupin cpuset="47" vcpu="23"/>
+  </cputune>
+  <os>
+    <type arch="x86_64" machine="pc-i440fx-bionic">hvm</type>
+    <kernel>/boot/vmlinuz-5.4.0-80-generic</kernel>
+    <initrd>/boot/initrd.img-5.4.0-80-generic</initrd>
+    <cmdline>console=ttyS0 root=/dev/sda1</cmdline>
+    <boot dev="hd"/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+  </features>
+  <cpu check="partial" match="exact" mode="custom">
+    <model fallback="allow">EPYC-IBPB</model>
+  </cpu>
+  <clock offset="utc">
+    <timer name="rtc" tickpolicy="catchup"/>
+    <timer name="pit" tickpolicy="delay"/>
+    <timer name="hpet" present="no"/>
+  </clock>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>destroy</on_crash>
+  <pm>
+    <suspend-to-mem enabled="no"/>
+    <suspend-to-disk enabled="no"/>
+  </pm>
+  <devices>
+    <emulator>/usr/bin/kvm-spice</emulator>
+    <disk device="disk" type="file">
+      <driver name="qemu" type="qcow2"/>
+      <source file="/home/ashish/vms/trident.qcow2"/>
+      <target bus="ide" dev="hda"/>
+      <address bus="0" controller="0" target="0" type="drive" unit="0"/>
+    </disk>
+    <controller index="0" model="ich9-ehci1" type="usb">
+      <address bus="0x00" domain="0x0000" function="0x7" slot="0x03" type="pci"/>
+    </controller>
+    <controller index="0" model="ich9-uhci1" type="usb">
+      <master startport="0"/>
+      <address bus="0x00" domain="0x0000" function="0x0" multifunction="on" slot="0x03" type="pci"/>
+    </controller>
+    <controller index="0" model="ich9-uhci2" type="usb">
+      <master startport="2"/>
+      <address bus="0x00" domain="0x0000" function="0x1" slot="0x03" type="pci"/>
+    </controller>
+    <controller index="0" model="ich9-uhci3" type="usb">
+      <master startport="4"/>
+      <address bus="0x00" domain="0x0000" function="0x2" slot="0x03" type="pci"/>
+    </controller>
+    <controller index="0" model="pci-root" type="pci"/>
+    <controller index="0" type="ide">
+      <address bus="0x00" domain="0x0000" function="0x1" slot="0x01" type="pci"/>
+    </controller>
+    <interface type="bridge">
+      <mac address="52:54:00:9a:7c:2d"/>
+      <source bridge="virbr0"/>
+      <model type="rtl8139"/>
+      <address bus="0x00" domain="0x0000" function="0x0" slot="0x02" type="pci"/>
+    </interface>
+    <serial type="pty">
+      <target port="0" type="isa-serial">
+        <model name="isa-serial"/>
+      </target>
+    </serial>
+    <console type="pty">
+      <target port="0" type="serial"/>
+    </console>
+    <input bus="ps2" type="mouse"/>
+    <input bus="ps2" type="keyboard"/>
+    <memballoon model="virtio">
+      <address bus="0x00" domain="0x0000" function="0x0" slot="0x04" type="pci"/>
+    </memballoon>
+  </devices>
+</domain>
