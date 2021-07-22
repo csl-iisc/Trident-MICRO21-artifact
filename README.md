@@ -80,11 +80,18 @@ $ git submodule update
 To compile Trident, do:
 
 ```
-$ cd Trident-MICRO21-artifact/sources/Trident
+$ cd Trident-MICRO21-artifact/sources/Trident; git checkout trident
 $ cp config .config; make oldconfig
 $ make -j; make install -j; update-grub;
 ```
-Compile HawkEye kernel image using the same steps.
+
+To compile HawkEye, do:
+
+```
+$ cd Trident-MICRO21-artifact/sources/HawkEye; git checkout hawkeye
+$ cp config .config; make oldconfig
+$ make -j; make install -j; update-grub;
+```
 
 Install and Create Virtual Machine Configurations
 -------------------------------------------------
