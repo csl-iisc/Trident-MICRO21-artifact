@@ -1,3 +1,6 @@
 [submodule "sources/HawkEye"]
 	path = sources/HawkEye
 	url = https://github.com/apanwariisc/HawkEye.git
+[submodule "sources/Trident"]
+	path = sources/Trident
+	url = https://github.com/csl-iisc/Trident

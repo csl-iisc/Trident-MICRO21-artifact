@@ -1,12 +1,13 @@
 #!/bin/bash
 
 # --- set of common functions and variables used across all experiments
-MEMCACHED_ARGS=" -u ashish"
+MEMCACHED_ARGS=" "
 CANNEAL_ARGS=" 1 150000 2000 $ROOT/datasets/canneal_small 7500 "
-XSBENCH_ARGS=" -- -s XL -t 24 -l 6000"
-GRAPH500_ARGS=" -- -s 26 -e 30"
+XSBENCH_ARGS=" -s XL -t 24 -l 800000000"
+GRAPH500_ARGS=" -s 26 -e 30"
 SVM_ARGS="-- -s 6 -n 36 $ROOT/datasets/kdd12"
-GAPBS_ARGS="-g 29 -n 20 -i 20"
+GUPS_ARGS=" 32 5000000 1024"
+GAPBS_ARGS=" -g 29 -n 20 -i 20"
 
 # always run on socket-0
 DATA_NODE=0
@@ -106,6 +107,8 @@ prepare_args()
         BENCH_ARGS=""
         if [ $BENCHMARK = "canneal" ]; then
                 BENCH_ARGS=$CANNEAL_ARGS
+        elif [ $BENCHMARK = "gups" ]; then
+                BENCH_ARGS=$GUPS_ARGS 
         elif [ $BENCHMARK = "memcached" ]; then
                 BENCH_ARGS=$MEMCACHED_ARGS 
         elif [ $BENCHMARK = "xsbench" ]; then
