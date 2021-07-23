@@ -148,6 +148,9 @@ def rewrite_config(config):
             child.text = str(get_vcpu_count(config))
             add_vcpu_numa_tune(config, main, child)
         if child.tag == 'memory':
+            child.text = str(get_memory_size(config))
+        if child.tag == 'currentMemory':
+            child.text = str(get_memory_size(config))
             add_memory_backing(config, main, child)
 
     tree.write(src)
