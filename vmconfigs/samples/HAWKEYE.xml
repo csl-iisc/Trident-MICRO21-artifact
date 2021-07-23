@@ -3,11 +3,6 @@
   <name>trident</name>
   <uuid>f8a03c5c-bea1-4fcf-b5c2-a4e13a3571cb</uuid>
   <memory unit="KiB">146800640</memory>
-  <memoryBacking>
-    <hugepages>
-      <page size="1048576" unit="KiB"/>
-    </hugepages>
-  </memoryBacking>
   <currentMemory unit="KiB">146800640</currentMemory>
   <vcpu placement="static">24</vcpu>
   <cputune>
@@ -38,9 +33,9 @@
   </cputune>
   <os>
     <type arch="x86_64" machine="pc-i440fx-bionic">hvm</type>
-    <kernel>/boot/vmlinuz-4.17.3-Trident+</kernel>
-    <initrd>/boot/initrd.img-4.17.3-Trident+</initrd>
-    <cmdline>console=ttyS0 root=/dev/sda1 default_hugepagesz=1G</cmdline>
+    <kernel>/boot/vmlinuz-4.17.3-HawkEye+</kernel>
+    <initrd>/boot/initrd.img-4.3.0-HawkEye+</initrd>
+    <cmdline>console=ttyS0 root=/dev/sda1 </cmdline>
     <boot dev="hd"/>
   </os>
   <features>

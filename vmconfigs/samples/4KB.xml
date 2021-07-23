@@ -6,36 +6,36 @@
   <currentMemory unit="KiB">146800640</currentMemory>
   <vcpu placement="static">24</vcpu>
   <cputune>
-    <vcpupin cpuset="12" vcpu="0"/>
-    <vcpupin cpuset="13" vcpu="1"/>
-    <vcpupin cpuset="14" vcpu="2"/>
-    <vcpupin cpuset="15" vcpu="3"/>
-    <vcpupin cpuset="16" vcpu="4"/>
-    <vcpupin cpuset="17" vcpu="5"/>
-    <vcpupin cpuset="18" vcpu="6"/>
-    <vcpupin cpuset="19" vcpu="7"/>
-    <vcpupin cpuset="20" vcpu="8"/>
-    <vcpupin cpuset="21" vcpu="9"/>
-    <vcpupin cpuset="22" vcpu="10"/>
-    <vcpupin cpuset="23" vcpu="11"/>
-    <vcpupin cpuset="36" vcpu="12"/>
-    <vcpupin cpuset="37" vcpu="13"/>
-    <vcpupin cpuset="38" vcpu="14"/>
-    <vcpupin cpuset="39" vcpu="15"/>
-    <vcpupin cpuset="40" vcpu="16"/>
-    <vcpupin cpuset="41" vcpu="17"/>
-    <vcpupin cpuset="42" vcpu="18"/>
-    <vcpupin cpuset="43" vcpu="19"/>
-    <vcpupin cpuset="44" vcpu="20"/>
-    <vcpupin cpuset="45" vcpu="21"/>
-    <vcpupin cpuset="46" vcpu="22"/>
-    <vcpupin cpuset="47" vcpu="23"/>
+    <vcpupin cpuset="0" vcpu="0"/>
+    <vcpupin cpuset="1" vcpu="1"/>
+    <vcpupin cpuset="2" vcpu="2"/>
+    <vcpupin cpuset="3" vcpu="3"/>
+    <vcpupin cpuset="4" vcpu="4"/>
+    <vcpupin cpuset="5" vcpu="5"/>
+    <vcpupin cpuset="6" vcpu="6"/>
+    <vcpupin cpuset="7" vcpu="7"/>
+    <vcpupin cpuset="8" vcpu="8"/>
+    <vcpupin cpuset="9" vcpu="9"/>
+    <vcpupin cpuset="10" vcpu="10"/>
+    <vcpupin cpuset="11" vcpu="11"/>
+    <vcpupin cpuset="24" vcpu="12"/>
+    <vcpupin cpuset="25" vcpu="13"/>
+    <vcpupin cpuset="26" vcpu="14"/>
+    <vcpupin cpuset="27" vcpu="15"/>
+    <vcpupin cpuset="28" vcpu="16"/>
+    <vcpupin cpuset="29" vcpu="17"/>
+    <vcpupin cpuset="30" vcpu="18"/>
+    <vcpupin cpuset="31" vcpu="19"/>
+    <vcpupin cpuset="32" vcpu="20"/>
+    <vcpupin cpuset="33" vcpu="21"/>
+    <vcpupin cpuset="34" vcpu="22"/>
+    <vcpupin cpuset="35" vcpu="23"/>
   </cputune>
   <os>
     <type arch="x86_64" machine="pc-i440fx-bionic">hvm</type>
-    <kernel>/boot/vmlinuz-5.4.0-80-generic</kernel>
-    <initrd>/boot/initrd.img-5.4.0-80-generic</initrd>
-    <cmdline>console=ttyS0 root=/dev/sda1</cmdline>
+    <kernel>/boot/vmlinuz-4.17.3-Trident+</kernel>
+    <initrd>/boot/initrd.img-4.17.3-Trident+</initrd>
+    <cmdline>console=ttyS0 root=/dev/sda1 </cmdline>
     <boot dev="hd"/>
   </os>
   <features>
