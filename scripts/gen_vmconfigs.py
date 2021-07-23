@@ -7,9 +7,16 @@ import multiprocessing
 import subprocess
 import psutil
 
-KERNEL_MITOSIS='/boot/vmlinuz-5.4.0-80-generic'
-INITRD_MITOSIS='/boot/initrd.img-5.4.0-80-generic'
-CMDLINE_MITOSIS='console=ttyS0 root=/dev/sda1'
+KERNEL_TRIDENT='/boot/vmlinuz-4.17.3-Trident+'
+INITRD_TRIDENT='/boot/initrd.img-4.17.3-Trident+'
+CMDLINE_TRIDENT='console=ttyS0 root=/dev/sda1 '
+
+CMDLINE_2MBHUGE_POSTFIX='default_hugepagesz=2M'
+CMDLINE_1GBHUGE_POSTFIX='default_hugepagesz=1G'
+
+KERNEL_HAWKEYE='/boot/vmlinuz-4.17.3-HawkEye+'
+INITRD_HAWKEYE='/boot/initrd.img-4.3.0-HawkEye+'
+
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -50,30 +57,42 @@ def test_and_set_hpb(tag):
 
 
 # Rewrite to boot with mitosis kernel image
-def rewrite_os(tag):
+def rewrite_os(config, tag):
     #new = new_element(tag_os, 'kernel', '/boot/vmlinuz-4.17.0-mitosis+')
     addKernel = True
     addInitrd = True
     addCmdline = True
+
+    cmdline_postfix = ''
+    if config == '2MBHUGE':
+        cmdline_postfix = CMDLINE_2MBHUGE_POSTFIX
+    if config == '1GBHUGE':
+        cmdline_postfix = CMDLINE_1GBHUGE_POSTFIX
+
     for child in tag:
         if child.tag == 'kernel':
-            child.text = KERNEL_MITOSIS
+            child.text = KERNEL_TRIDENT
+            if config == 'HAWKEYE':
+                child.text = KERNEL_HAWKEYE
             addKernel = False
         if child.tag == 'initrd':
-            child.text = INITRD_MITOSIS
+            child.text = INITRD_TRIDENT
+            if config == 'HAWKEYE':
+                child.text = INITRD_HAWKEYE
             addInitrd = False
         if child.tag == 'cmdline':
-            child.text = CMDLINE_MITOSIS
+            child.text = CMDLINE_TRIDENT
+            child.text += cmdline_postfix
             addCmdline = False
         #if child.tag == 'type':
         #    test_and_set_hpb(child)
 
     if addKernel:
-        newtag = new_element(tag, 'kernel', KERNEL_MITOSIS)
+        newtag = new_element(tag, 'kernel', KERNEL_TRIDENT)
     if addInitrd:
-        newtag = new_element(tag, 'initrd', INITRD_MITOSIS)
+        newtag = new_element(tag, 'initrd', INITRD_TRIDENT)
     if addCmdline:
-        newtag = new_element(tag, 'cmdline', CMDLINE_MITOSIS)
+        newtag = new_element(tag, 'cmdline', CMDLINE_TRIDENT)
 
 # Bind vCPUs 1:1: to pCPUs
 def add_vcpu_numa_tune(config, main, child):
@@ -96,7 +115,7 @@ def add_vcpu_numa_tune(config, main, child):
 
 def add_memory_backing(config, main, child):
     remove_tag(main, 'memoryBacking')
-    if config == '4KB':
+    if config == '4KB' or config == 'HAWKEYE':
         return
     pos = list(main).index(child)
     mem_backing = ET.Element('memoryBacking')
@@ -124,7 +143,7 @@ def rewrite_config(config):
     main = tree.getroot()
     for child in main:
         if child.tag == 'os':
-            rewrite_os(child)
+            rewrite_os(config, child)
         if child.tag == 'vcpu':
             child.text = str(get_vcpu_count(config))
             add_vcpu_numa_tune(config, main, child)
@@ -156,7 +175,7 @@ if __name__ == '__main__':
     if len(sys.argv) == 2:
         parent_vm = sys.argv[1]
 
-    configs = ['4KB', '2MBHUGE', '1GBHUGE']
+    configs = ['4KB', '2MBHUGE', '1GBHUGE', 'HAWKEYE']
     dump_vm_config_template(parent_vm, configs)
     for config in configs:
         print('re-writing: ' + config+'.xml')
