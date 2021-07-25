@@ -14,11 +14,19 @@ benchmarks = []
 global verbose
 
 # --- all workload configurations
-configs = ['4KB', '2MB']
-pretty_configs = ['4KB', '2MB']
+configs = ['4KB', '2MBTHP', '2MBHUGE', '1GBHUGE', 'TRIDENT', 'TRIDENT-1G', 'TRIDENT-NC', 'HAWKEYE', '2MBTHPF', 'TIDENTF', 'TRIDENT-1GF', 'TRIDENT-NCF', 'HAWKEYEF', '4KB4KB', '2MBTHP2MBTHP', 'TRIDENTTRIDENT', 'HAWKEYEHAWKEYE', '2MBTHPF2MBTHPF', 'TRIDENTFTRIDENTF', 'TRIDENTFPVTRIDENTFPV']
+pretty_configs = ['4KB', '2MB-THP', '2MB-HUGE', '1GB-HUGE', 'Trident', 'Trident-1G', 'Trident-NC', 'HawkEye', '2MB-THP', 'Trident', 'Trident-1G', 'Trident-NC', 'HawkEye', '4KB-4KB', '2MBTHP-2MBTHP', 'Trident-Trident', 'Hawkeye-HawkEye', '2MB-2MB', 'Trident-Trident', 'TridentPV-TridentPV']
 # --- all workloads
 workloads = ['xsbench', 'gups', 'svm', 'redis', 'btree', 'graph500', 'memcached', 'canneal', 'pr', 'cc', 'bc', 'cg']
-pretty_workloads =  workloads
+
+main_workloads = ['xsbench', 'gups', 'svm', 'redis', 'btree', 'graph500', 'memcached', 'canneal']
+fig1_configs = ['4KB', '2MBTHP', '2MBHUGE', '1GBHUGE']
+fig2_configs = ['4KB4KB', '2MBTHP2MBTHP', '1GBHUGE1GBHUGE']
+fig9_configs = ['2MBTHP', 'HAWKEYE', 'TRIDENT']
+fig10_configs = fig9_configs
+fig11a_configs = ['2MBTHP', 'TRIDENT-1G', 'TRIDENT-NC', 'TRIDENT'] 
+fig11b_configs = ['2MBTHPF', 'TRIDENT-1GF', 'TRIDENT-NCF', 'TRIDENTF'] 
+fig12_configs = ['2MBTHP2MBTHP', 'HAWKEYEHAWKEYE', 'TRIDENTTRIDENT'] 
 
 def get_time_from_log(line):
     exec_time = int(line[line.find(":")+2:])
@@ -96,12 +104,7 @@ def pretty(name):
     if name in configs:
         index = configs.index(name)
         return pretty_configs[index]
-    if name in workloads:
-        index = workloads.index(name)
-        return pretty_workloads[index]
-
-    print ("ERROR converting \"%s\" to pretty" %name)
-    sys.exit()
+    return name
 
 def dump_workload_config_average(output, bench, config, fd, fd2, absolute):
     time = count = pwc = 0
@@ -142,130 +145,63 @@ def process_all_runs(fd, fd2, output, absolute):
         for config in configs:
             dump_workload_config_average(output, bench, config, fd, fd2, absolute)
 
-def gen_csv_common(dst, src, fig_workloads, fig_configs):
-    #print(dst)
+def gen_csv_common(dst, benchs, confs, baseline, metric):
     out_fd = open(dst, mode = 'w')
     writer = csv.writer(out_fd, delimiter='\t', quoting=csv.QUOTE_MINIMAL)
-    for workload in fig_workloads:
-        for config in fig_configs:
+    denominator = 1000000.0
+
+    for workload in benchs:
+        for exp in avg_summary:
+            if exp['bench'] == workload and exp['config'] == baseline:
+                denominator = exp[metric]
+
+        for config in confs:
             for exp in avg_summary:
                 if exp['bench'] == workload and exp['config'] == config:
-                    writer.writerow([workload, pretty_configs[configs.index(config)], exp['time'], exp['pwc']])
+                    writer.writerow([workload, pretty_configs[configs.index(config)], round(exp[metric] / denominator, 2)])
 
-def gen_fig1_csv(root, src, target, plots):
-    out_csv = os.path.join(root, ("evaluation/%s/processed/figure-1.csv" %(target)))
-    workloads = ["GUPS", "BTree", "Redis", "XSBench", "Memcached", "Canneal"]
-    configs = ["LL", "LR", "RL", "RR", "LRI", "RLI", "RRI"]
-    gen_csv_common(out_csv, src, workloads, configs)
-    if os.path.exists(out_csv):
-        out_pdf = os.path.join(root, ("evaluation/%s/processed/figure-1.pdf" %(target)))
-        plotgen = os.path.join(plots, "plot_figure-1.py")
-        os.system("%s %s %s" %(plotgen, out_csv, out_pdf))
-        print(out_pdf)
 
-def gen_fig3_csv(root, src, target, plots):
-    # --- Figure-3a
-    out_csv = os.path.join(root, ("evaluation/%s/processed/figure-3a.csv" %(target)))
-    workloads = ["GUPS", "BTree", "Redis", "XSBench", "Memcached", "Canneal"]
-    configs = ["LL", "RRI", "RRIE", "RRIG", "RRIM"]
-    gen_csv_common(out_csv, src, workloads, configs)
-    if os.path.exists(out_csv):
-        out_pdf = os.path.join(root, ("evaluation/%s/processed/figure-3a.pdf" %(target)))
-        plotgen = os.path.join(plots, "plot_figure-3a.py")
-        os.system("%s %s %s" %(plotgen, out_csv, out_pdf))
-        print(out_pdf)
-    # --- Figure-3b
-    out_csv = os.path.join(root, ("evaluation/%s/processed/figure-3b.csv" %(target)))
-    workloads = ["GUPS", "BTree", "Redis", "XSBench", "Memcached", "Canneal"]
-    configs = ["TLL", "TRRI", "TRRIE", "TRRIG", "TRRIM"]
-    gen_csv_common(out_csv, src, workloads, configs)
-    if os.path.exists(out_csv):
-        out_pdf = os.path.join(root, ("evaluation/%s/processed/figure-3b.pdf" %(target)))
-        plotgen = os.path.join(plots, "plot_figure-3b.py")
-        os.system("%s %s %s" %(plotgen, out_csv, out_pdf))
-        print(out_pdf)
-    # --- Figure-3c
-    out_csv = os.path.join(root, ("evaluation/%s/processed/figure-3c.csv" %(target)))
-    workloads = ["GUPS", "BTree", "Redis", "XSBench", "Memcached", "Canneal"]
-    configs = ["TFLL", "TFRRI", "TFRRIE", "TFRRIG", "TFRRIM"]
-    gen_csv_common(out_csv, src, workloads, configs)
-    if os.path.exists(out_csv):
-        out_pdf = os.path.join(root, ("evaluation/%s/processed/figure-3c.pdf" %(target)))
-        plotgen = os.path.join(plots, "plot_figure-3c.py")
-        os.system("%s %s %s" %(plotgen, out_csv, out_pdf))
-        print(out_pdf)
+def gen_fig1_csv(root):
+    out_csv = os.path.join(root, ('report/figure-1a.csv'))
+    gen_csv_common(out_csv, workloads, fig1_configs, '4KB', 'time')
+    out_csv = os.path.join(root, ('report/figure-1b.csv'))
+    gen_csv_common(out_csv, workloads, fig1_configs, '4KB', 'pwc')
 
-def gen_fig4_csv(root, src, target, plots):
-    # --- Figure-4a
-    out_csv = os.path.join(root, ("evaluation/%s/processed/figure-4a.csv" %(target)))
-    workloads = ["Memcached", "XSBench", "Graph500", "Canneal"]
-    configs = ["F", "FM", "FA", "FAM", "I", "IM"]
-    gen_csv_common(out_csv, src, workloads, configs)
-    if os.path.exists(out_csv):
-        out_pdf = os.path.join(root, ("evaluation/%s/processed/figure-4a.pdf" %(target)))
-        plotgen = os.path.join(plots, "plot_figure-4a.py")
-        os.system("%s %s %s" %(plotgen, out_csv, out_pdf))
-        print(out_pdf)
-    # --- Figure-4b
-    out_csv = os.path.join(root, ("evaluation/%s/processed/figure-4b.csv" %(target)))
-    workloads = ["Memcached", "XSBench", "Graph500", "Canneal"]
-    configs = ["TF", "TFM", "TFA", "TFAM", "TI", "TIM"]
-    gen_csv_common(out_csv, src, workloads, configs)
-    if os.path.exists(out_csv):
-        out_pdf = os.path.join(root, ("evaluation/%s/processed/figure-4b.pdf" %(target)))
-        plotgen = os.path.join(plots, "plot_figure-4b.py")
-        os.system("%s %s %s" %(plotgen, out_csv, out_pdf))
-        print(out_pdf)
+def gen_fig2_csv(root):
+    out_csv = os.path.join(root, ('report/figure-2a.csv'))
+    gen_csv_common(out_csv, workloads, fig2_configs, '4KB-4KB', 'time')
+    out_csv = os.path.join(root, ('report/figure-2b.csv'))
+    gen_csv_common(out_csv, workloads, fig2_configs, '4KB-4KB', 'pwc')
 
-def gen_fig5_csv(root, src, target, plots):
-    # --- Figure-5a
-    out_csv = os.path.join(root, ("evaluation/%s/processed/figure-5a.csv" %(target)))
-    workloads = ["Memcached", "XSBench", "Graph500", "Canneal"]
-    configs = ["OF", "OFMP", "OFMF"]
-    gen_csv_common(out_csv, src, workloads, configs)
-    if os.path.exists(out_csv):
-        out_pdf = os.path.join(root, ("evaluation/%s/processed/figure-5a.pdf" %(target)))
-        plotgen = os.path.join(plots, "plot_figure-5a.py")
-        os.system("%s %s %s" %(plotgen, out_csv, out_pdf))
-        print(out_pdf)
-    # --- Figure-5b
-    out_csv = os.path.join(root, ("evaluation/%s/processed/figure-5b.csv" %(target)))
-    workloads = ["Memcached", "XSBench", "Graph500", "Canneal"]
-    configs = ["TOF", "TOFMP", "TOFMF"]
-    gen_csv_common(out_csv, src, workloads, configs)
-    if os.path.exists(out_csv):
-        out_pdf = os.path.join(root, ("evaluation/%s/processed/figure-5b.pdf" %(target)))
-        plotgen = os.path.join(plots, "plot_figure-5b.py")
-        os.system("%s %s %s" %(plotgen, out_csv, out_pdf))
-        print(out_pdf)
+def gen_fig9_csv(root):
+    out_csv = os.path.join(root, ('report/figure-9a.csv'))
+    gen_csv_common(out_csv, main_workloads, fig9_configs, '2MBTHP', 'time')
+    out_csv = os.path.join(root, ('report/figure-9b.csv'))
+    gen_csv_common(out_csv, main_workloads, fig9_configs, '2MBTHP', 'pwc')
 
-def gen_fig6_csv(root, src, target, plots):
-    script = os.path.join(root, "scripts/helpers/helper_figure-6.sh")
-    os.system(script)
-    out_csv = os.path.join(root, ("evaluation/%s/processed/figure-6a.csv" %(target)))
-    if os.path.exists(out_csv):
-        out_pdf = os.path.join(root, ("evaluation/%s/processed/figure-6a.pdf" %(target)))
-        plotgen = os.path.join(plots, "plot_figure-6a.py")
-        os.system("%s %s %s" %(plotgen, out_csv, out_pdf))
-        print(out_pdf)
-    out_csv = os.path.join(root, ("evaluation/%s/processed/figure-6b.csv" %(target)))
-    if os.path.exists(out_csv):
-        out_pdf = os.path.join(root, ("evaluation/%s/processed/figure-6b.pdf" %(target)))
-        plotgen = os.path.join(plots, "plot_figure-6b.py")
-        print(out_pdf)
-        os.system("%s %s %s" %(plotgen, out_csv, out_pdf))
+def gen_fig10_csv(root):
+    out_csv = os.path.join(root, ('report/figure-10a.csv'))
+    gen_csv_common(out_csv, main_workloads, fig10_configs, '2MBTHPF', 'time')
+    out_csv = os.path.join(root, ('report/figure-10b.csv'))
+    gen_csv_common(out_csv, main_workloads, fig10_configs, '2MBTHPF', 'pwc')
 
-def gen_fig2_csv(root, target):
-    src = os.path.join(root, "scripts/helpers/compile_ptdumps.sh %s" %(target))
-    os.system(src)
+def gen_fig11_csv(root):
+    out_csv = os.path.join(root, ('report/figure-11a.csv'))
+    gen_csv_common(out_csv, main_workloads, fig11a_configs, '2MBTHP', 'time')
+    out_csv = os.path.join(root, ('report/figure-11b.csv'))
+    gen_csv_common(out_csv, main_workloads, fig11b_configs, '2MBTHPF', 'time')
 
-def copy_final_graphs(root, target):
-    dst = os.path.join(root, ("vmitosis-artifact-report/%s/" %(target)))
-    if os.path.exists(dst):
-        shutil.rmtree(dst)
-    src = os.path.join(root, ("evaluation/%s/processed/" %(target)))
-    if os.path.exists(src):
-        shutil.copytree(src, dst)
+def gen_fig12_csv(root):
+    out_csv = os.path.join(root, ('report/figure-12.csv'))
+    gen_csv_common(out_csv, main_workloads, fig12_configs, '2MBTHP2MBTHP', 'time')
+
+def gen_report(root):
+    gen_fig1_csv(root)
+    gen_fig2_csv(root)
+    gen_fig9_csv(root)
+    gen_fig10_csv(root)
+    gen_fig11_csv(root)
+    gen_fig12_csv(root)
 
 if __name__=="__main__":
     summary = []
@@ -296,12 +232,6 @@ if __name__=="__main__":
     process_all_runs(fd_avg, fd_all, summary, True)
     fd_avg.close()
     fd_all.close()
-    #gen_fig1_csv(root, avg_summary, target, plots)
-    #if process_ptdumps:
-    #    gen_fig2_csv(root, target)
-    #gen_fig3_csv(root, avg_summary, target, plots)
-    #gen_fig4_csv(root, avg_summary, target, plots)
-    #gen_fig5_csv(root, avg_summary, target, plots)
-    #gen_fig6_csv(root, avg_summary, target, plots)
-    #copy_final_graphs(root, target)
+
+    gen_report(root)
 

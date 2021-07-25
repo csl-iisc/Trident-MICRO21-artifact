@@ -43,34 +43,6 @@ fragment_memory()
         fi
 }
 
-prepare_paths_virtual()
-{
-        BENCHPATH=$ROOT"/bin/$BENCHMARK"
-        INTERFERENCEPATH=$ROOT"/bin/bench_stream"
-        PERF=$ROOT"/bin/perf"
-        NUMACTL=$ROOT"/bin/numactl"
-        if [ ! -e $BENCHPATH ]; then
-            echo "Benchmark binary is missing: $BENCHPATH"
-            exit
-        fi
-        if [ ! -e $PERF ]; then
-            echo "Perf binary is missing: $PERF "
-            exit
-        fi
-        if [ ! -e $NUMACTL ]; then
-            echo "numactl is missing: $NUMACTL"
-            exit
-        fi
-        # where to put the output file (based on CONFIG)
-        DATADIR=$ROOT"/evaluation/$BENCHMARK"
-        RUNDIR=$DATADIR/$(hostname)-$BENCHMARK-$CONFIG-$CONFIG-$(date +"%Y%m%d-%H%M%S")
-        mkdir -p $RUNDIR
-        if [ $? -ne 0 ]; then
-                echo "Error creating output directory: $RUNDIR"
-        fi
-        OUTFILE=$RUNDIR/perflog-$BENCHMARK-$(hostname)-$CONFIG.dat
-}
-
 prepare_paths()
 {
         BENCHPATH=$ROOT"/bin/$BENCHMARK"
@@ -191,15 +163,15 @@ setup_4kb_configs()
         echo 4096 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/pages_to_scan > /dev/null 2>&1
 }
 
+PREFIX='/sys/devices/system/node/node0/hugepages/'
 prepare_system_configs()
 {
         CONFIG=$1
-	NR_HUGETLB_PAGES=0
         # --- reserve/drain HUGETLB Pool
 	if [ $CONFIG = "2MBHUGE" ]; then
-		NR_HUGETLB_PAGES=$HUGETLB_2MB_PAGES
+		echo $HUGETLB_2MB_PAGES | sudo tee $PREFIX/hugepages-2048kB/nr_hugepages
 	elif [ $CONFIG = "1GBHUGE" ]; then
-		NR_HUGETLB_PAGES=$HUGETLB_1GB_PAGES
+		echo $HUGETLB_1GB_PAGES | sudo tee $PREFIX/hugepages-1048576kB/nr_hugepages
 	fi
 	# reserve hugetlb pages
         $ROOT/bin/numactl -m $DATA_NODE echo $NR_HUGETLB_PAGES |
@@ -225,10 +197,8 @@ prepare_system_configs()
 cleanup_system_configs()
 {
         # --- Drain HUGETLB Pool
-         $ROOT/bin/numactl -m $DATA_NODE echo 0 | sudo tee /proc/sys/vm/nr_hugepages_mempolicy > /dev/null
-        if [ $? -ne 0 ]; then
-                echo "ERROR Draining HUGETLB POOL."
-        fi
+	echo 0 | sudo tee $PREFIX/hugepages-2048kB/nr_hugepages
+	echo 0 | sudo tee $PREFIX/hugepages-1048576kB/nr_hugepages
 }
 
 launch_workload()

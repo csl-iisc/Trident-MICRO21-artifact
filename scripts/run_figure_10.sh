@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BENCHMARKS="xsbench gups svm redis btree graph500 memcached canneal pr cc bc cg"
+BENCHMARKS="xsbench gups svm redis btree graph500 memcached canneal"
 # -- To execute with HAWKEYE, boot your system with HAWKEYE kernel image
 CONFIGS="2MBTHPF HAWKEYEF TRIDENTF"
 

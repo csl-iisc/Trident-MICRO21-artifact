@@ -1,10 +1,7 @@
 #!/bin/bash
 
 BENCHMARKS="xsbench gups svm redis btree graph500 memcached canneal"
-CONFIGS="2MBTHP HAWKEYE TRIDENT"  # --- re-use 2MBTHP from Figure-1
-CONFIGS="HAWKEYE TRIDENT"
-
-BENCHMARKS="gups"
+CONFIGS="2MBTHP2MBTHP HAWKEYEHAWKEYE TRIDENTTRIDENT"
 
 SCRIPTS=$(dirname `readlink -f "$0"`)
 ROOT="$(dirname "$SCRIPTS")"
@@ -16,9 +13,9 @@ for BENCHMARK in $BENCHMARKS; do
 		cleanup_system_configs
 		setup_4KB_configs
 		fragment_memory
-		prepare_args
 		prepare_system_configs
-		prepare_paths
-		launch_workload
+		prepare_kvm_vm
+		SRC=$SCRIPTS/run_guest.sh
+		ssh $GUESTUSER@$GUESTIP "\"$SRC\" \"$BENCHMARK\" \"$CONFIG\""
 	done
 done

@@ -13,9 +13,9 @@ source $SCRIPTS/common.sh
 
 cleanup_system_configs
 setup_4KB_configs # --- setup everything with normal system config
-fragment_memory $CONFIG
-prepare_args $CONFIG
-prepare_system_configs $CONFIG
-prepare_paths_virtual $BENCHMARK $CONFIG
+fragment_memory
+prepare_args
+prepare_system_configs
+prepare_paths
 launch_workload
 cleanup_system_configs
