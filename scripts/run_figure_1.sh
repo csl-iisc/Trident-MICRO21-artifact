@@ -10,6 +10,7 @@ BENCHMARKS="gups btree"
 SCRIPTS=$(dirname `readlink -f "$0"`)
 ROOT="$(dirname "$SCRIPTS")"
 source $SCRIPTS/common.sh
+source $SCRIPTS/configs.sh
 
 for BENCHMARK in $BENCHMARKS; do
 	for CONFIG in $CONFIGS; do

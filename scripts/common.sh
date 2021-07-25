@@ -17,9 +17,6 @@ CPU_NODE=0
 HUGETLB_2MB_PAGES=100000
 HUGETLB_1GB_PAGES=80 #150
 
-# perf stats to collect
-PERF_EVENTS=cycles,instructions
-
 fragment_memory()
 {
 	if [[ $CONFIG = *F* ]]; then
