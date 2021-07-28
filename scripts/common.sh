@@ -108,34 +108,27 @@ setup_trident_configs()
         echo 1 |  sudo tee /proc/sys/vm/compaction_smart > /dev/null 2>&1
         echo 5 |  sudo tee /proc/sys/vm/smart_compaction_retries 2>&1
         echo 2097152 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/pages_to_scan > /dev/null 2>&1
+	echo 0 | sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/collapse_via_hypercall > /dev/null 2>&1
 }
 
 setup_trident_nosmart_configs()
 {
-        THP="always"
-        echo $THP |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled > /dev/null 2>&1
-        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/defrag > /dev/null 2>&1
-        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_pmd > /dev/null 2>&1
-        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_pud > /dev/null 2>&1
-        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/khugepaged_collapse_pmd > /dev/null 2>&1
-        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/khugepaged_collapse_pud > /dev/null 2>&1
+	setup_trident_configs
         echo 0 |  sudo tee /proc/sys/vm/compaction_smart > /dev/null 2>&1
         echo 1 |  sudo tee /proc/sys/vm/smart_compaction_retries 2>&1
-        echo 2097152 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/pages_to_scan > /dev/null 2>&1
 }
 
 setup_trident_1gbonly_configs()
 {
-        THP="always"
-        echo $THP |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled > /dev/null 2>&1
-        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/defrag > /dev/null 2>&1
+	setup_trident_configs
         echo 0 |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_pmd > /dev/null 2>&1
-        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_pud > /dev/null 2>&1
         echo 0 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/khugepaged_collapse_pmd > /dev/null 2>&1
-        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/khugepaged_collapse_pud > /dev/null 2>&1
-        echo 1 |  sudo tee /proc/sys/vm/compaction_smart > /dev/null 2>&1
-        echo 5 |  sudo tee /proc/sys/vm/smart_compaction_retries 2>&1 
-        echo 2097152 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/pages_to_scan > /dev/null 2>&1
+}
+
+setup_tridentpv_configs()
+{
+	setup_trident_configs
+	echo 1 | sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/collapse_via_hypercall > /dev/null 2>&1
 }
 
 setup_2mbthp_configs()
@@ -193,6 +186,8 @@ prepare_system_configs()
                 setup_trident_nosmart_configs
         elif [[ $CONFIG = *TRIDENT-1G* ]]; then # TRIDENT with 1GB pages only
                 setup_trident_1gbonly_configs
+        elif [[ $CONFIG = *TRIDENT*PV* ]]; then # Paravirtualized TRIDENT
+		setup_tridentpv_configs
         else
                 setup_4kb_configs
         fi
