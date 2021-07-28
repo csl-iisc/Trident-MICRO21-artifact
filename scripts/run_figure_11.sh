@@ -1,8 +1,9 @@
 #!/bin/bash
 
 BENCHMARKS="xsbench gups svm redis btree graph500 memcached canneal"
-# -- To execute with HAWKEYE, boot your system with HAWKEYE kernel image
-CONFIGS="TRIDENT-1G TRIDENT-NC TRIDENT-1GF TRIDENT-NCF" # -- reuse 2MBTHP and TRIDENT from Figure-9
+#CONFIGS="2MBTHP TRIDENT TRIDENT-1G TRIDENT-NC TRIDENT-1GF TRIDENT-NCF"
+# -- Better to re-use 2MBTHP and TRIDENT from Figure-9
+CONFIGS="TRIDENT-1G TRIDENT-NC TRIDENT-1GF TRIDENT-NCF"
 
 SCRIPTS=$(dirname `readlink -f "$0"`)
 ROOT="$(dirname "$SCRIPTS")"

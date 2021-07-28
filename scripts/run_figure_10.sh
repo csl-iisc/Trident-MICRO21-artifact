@@ -1,8 +1,9 @@
 #!/bin/bash
 
 BENCHMARKS="xsbench gups svm redis btree graph500 memcached canneal"
-# -- To execute with HAWKEYE, boot your system with HAWKEYE kernel image
-CONFIGS="2MBTHPF HAWKEYEF TRIDENTF"
+CONFIGS="2MBTHPF TRIDENTF" #HAWKEYEF
+# -- For HAWKEYEF, boot system with HawkEye and uncomment the following line
+#CONFIGS="HAWKEYEF"
 
 SCRIPTS=$(dirname `readlink -f "$0"`)
 ROOT="$(dirname "$SCRIPTS")"

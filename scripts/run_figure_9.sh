@@ -1,10 +1,11 @@
 #!/bin/bash
 
 BENCHMARKS="xsbench gups svm redis btree graph500 memcached canneal"
-CONFIGS="2MBTHP HAWKEYE TRIDENT"  # --- re-use 2MBTHP from Figure-1
-CONFIGS="HAWKEYE TRIDENT"
-
-BENCHMARKS="gups"
+#CONFIGS="2MBTHP TRIDENT" #HAWKEYE
+# -- Better to re-use 2MBTHP from Figure-1
+CONFIGS="TRIDENT"
+# -- For HAWKEYE, boot system with HawkEye and uncomment the following line
+#CONFIGS="HAWKEYE"
 
 SCRIPTS=$(dirname `readlink -f "$0"`)
 ROOT="$(dirname "$SCRIPTS")"

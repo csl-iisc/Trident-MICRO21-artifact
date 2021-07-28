@@ -1,10 +1,10 @@
 #!/bin/bash
 
 BENCHMARKS="xsbench gups svm redis btree graph500 memcached canneal pr cc bc cg"
-# To execute 1GBHUGE or 2MBHUGE configurations, boot your kernel with command-line parameter
-# "default_hugepagesz=1G or default_hugepagesz=2M"
-BENCHMARKS="btree"
-CONFIGS="4KB4KB 2MBHUGE2MBHUGE 1GBHUGE1GBHUGE"
+CONFIGS="4KB4KB 2MBHUGE2MBHUGE" #1GBHUGE1GBHUGE
+# For 1GBHUGE1GBHUGE, boot host kernel with command-line parameter "default_hugepagesz=1G"
+# and uncomment the following line
+#CONFIGS="1GBHUGE1GBHUGE"
 
 SCRIPTS=$(dirname `readlink -f "$0"`)
 ROOT="$(dirname "$SCRIPTS")"
