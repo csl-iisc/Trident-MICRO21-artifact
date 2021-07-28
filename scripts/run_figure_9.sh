@@ -16,7 +16,7 @@ for BENCHMARK in $BENCHMARKS; do
 	for CONFIG in $CONFIGS; do
 		cleanup_system_configs
 		setup_4KB_configs
-		fragment_memory
+		drop_caches
 		prepare_args
 		prepare_system_configs
 		prepare_paths

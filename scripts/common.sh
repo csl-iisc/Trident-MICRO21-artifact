@@ -14,8 +14,14 @@ DATA_NODE=0
 CPU_NODE=0
 
 # number of hugetlb pages
-HUGETLB_2MB_PAGES=100000
-HUGETLB_1GB_PAGES=80 #150
+HUGETLB_2MB_PAGES=80000
+HUGETLB_1GB_PAGES=160
+
+drop_caches()
+{
+	echo "Dropping caches for config: $CONFIG"
+	echo 3 |  sudo tee /proc/sys/vm/drop_caches > /dev/null
+}
 
 fragment_memory()
 {
@@ -38,8 +44,7 @@ fragment_memory()
                 # --- Run for 10 minutes
                 $ROOT/bin/numactl -c $CPU_NODE -m $DATA_NODE python $SCRIPTS/fragment.py $FRAG_FILE_1 $FRAG_FILE_2 600 36 > /dev/null
         else
-                echo "Dropping caches for config: $CONFIG"
-                echo 3 |  sudo tee /proc/sys/vm/drop_caches > /dev/null
+		drop_caches
         fi
 }
 

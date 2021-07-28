@@ -15,7 +15,7 @@ for BENCHMARK in $BENCHMARKS; do
 	for CONFIG in $CONFIGS; do
 		cleanup_system_configs
 		setup_4KB_configs
-		fragment_memory
+		drop_caches
 		prepare_system_configs
 		prepare_kvm_vm
 		SRC=$SCRIPTS/run_guest.sh
