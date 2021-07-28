@@ -14,12 +14,22 @@ benchmarks = []
 global verbose
 
 # --- all workload configurations
-configs = ['4KB', '2MBTHP', '2MBHUGE', '1GBHUGE', 'TRIDENT', 'TRIDENT-1G', 'TRIDENT-NC', 'HAWKEYE', '2MBTHPF', 'TIDENTF', 'TRIDENT-1GF', 'TRIDENT-NCF', 'HAWKEYEF', '4KB4KB', '2MBTHP2MBTHP', 'TRIDENTTRIDENT', 'HAWKEYEHAWKEYE', '2MBTHPF2MBTHPF', 'TRIDENTFTRIDENTF', 'TRIDENTFPVTRIDENTFPV']
-pretty_configs = ['4KB', '2MB-THP', '2MB-HUGE', '1GB-HUGE', 'Trident', 'Trident-1G', 'Trident-NC', 'HawkEye', '2MB-THP', 'Trident', 'Trident-1G', 'Trident-NC', 'HawkEye', '4KB-4KB', '2MBTHP-2MBTHP', 'Trident-Trident', 'Hawkeye-HawkEye', '2MB-2MB', 'Trident-Trident', 'TridentPV-TridentPV']
-# --- all workloads
-workloads = ['xsbench', 'gups', 'svm', 'redis', 'btree', 'graph500', 'memcached', 'canneal', 'pr', 'cc', 'bc', 'cg']
+configs = ['4KB', '2MBTHP', '2MBHUGE', '1GBHUGE', 'TRIDENT', 'TRIDENT-1G', \
+          'TRIDENT-NC', 'HAWKEYE', '2MBTHPF', 'TIDENTF', 'TRIDENT-1GF', \
+          'TRIDENT-NCF', 'HAWKEYEF', '4KB4KB', '2MBTHP2MBTHP', 'TRIDENTTRIDENT', \
+          'HAWKEYEHAWKEYE', '2MBTHP2MBTHPF', 'TRIDENTTRIDENTF', 'TRIDENTTRIDENTFPV']
+pretty_configs = ['4KB', '2MB-THP', '2MB-HUGE', '1GB-HUGE', 'Trident', 'Trident-1G', \
+          'Trident-NC', 'HawkEye', '2MB-THP', 'Trident', 'Trident-1G', 'Trident-NC', \
+          'HawkEye', '4KB-4KB', '2MB+2MB', 'Trident+Trident', 'HawkEye+HawkEye', \
+          '2MB+2MB', 'Trident+Trident', 'TridentPV+TridentPV']
 
-main_workloads = ['xsbench', 'gups', 'svm', 'redis', 'btree', 'graph500', 'memcached', 'canneal']
+# --- all workloads
+workloads = ['xsbench', 'gups', 'svm', 'redis', 'btree', 'graph500', 'memcached', \
+          'canneal', 'pr', 'cc', 'bc', 'cg']
+# --- workloads used in final evaluation
+main_workloads = ['xsbench', 'gups', 'svm', 'redis', 'btree', 'graph500', \
+          'memcached', 'canneal']
+
 fig1_configs = ['4KB', '2MBTHP', '2MBHUGE', '1GBHUGE']
 fig2_configs = ['4KB4KB', '2MBTHP2MBTHP', '1GBHUGE1GBHUGE']
 fig9_configs = ['2MBTHP', 'HAWKEYE', 'TRIDENT']
