@@ -1,7 +1,7 @@
 #!/bin/bash
 
 BENCHMARKS="xsbench gups svm redis btree graph500 memcached canneal"
-CONFIGS="2MBTHP2MBTHPF TRIDENTTRIDENTF TRIDENTTRIDENTFPV"
+CONFIGS="2MBTHP-2MBTHP-F TRIDENT-TRIDENT-F TRIDENTPV-TRIDENTPV-F"
 
 SCRIPTS=$(dirname `readlink -f "$0"`)
 ROOT="$(dirname "$SCRIPTS")"

@@ -1,10 +1,10 @@
 #!/bin/bash
 
 BENCHMARKS="xsbench gups svm redis btree graph500 memcached canneal pr cc bc cg"
-CONFIGS="4KB4KB 2MBHUGE2MBHUGE" #1GBHUGE1GBHUGE
-# For 1GBHUGE1GBHUGE, boot host kernel with command-line parameter "default_hugepagesz=1G"
+CONFIGS="4KB-4KB 2MBHUGE-2MBHUGE" #1GBHUGE-1GBHUGE
+# For 1GBHUGE-1GBHUGE, boot host kernel with command-line parameter "default_hugepagesz=1G"
 # and uncomment the following line
-#CONFIGS="1GBHUGE1GBHUGE"
+#CONFIGS="1GBHUGE-1GBHUGE"
 
 SCRIPTS=$(dirname `readlink -f "$0"`)
 ROOT="$(dirname "$SCRIPTS")"

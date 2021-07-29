@@ -42,7 +42,7 @@ In addition to the packages shipped with Ubuntu 18.04 LTS the following
 packets are required:
 
 ```
-$ sudo apt install build-essential bison \
+$ sudo apt install build-essential bison bc \
 		libncurses-dev flex libssl-dev automake \
 		libelf-dev libnuma-dev python3 git \
 		wget libncurses5-dev libevent-dev \
