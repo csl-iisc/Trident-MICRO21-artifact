@@ -42,17 +42,15 @@ In addition to the packages shipped with Ubuntu 18.04 LTS the following
 packets are required:
 
 ```
-$ sudo apt-get install build-essential libncurses-dev \
-                     bison flex libssl-dev libelf-dev \
-                     libnuma-dev python3 python3-pip \
-                     python3-matplotlib python3-numpy \
-                     git wget kernel-package fakeroot ccache \
-                     libncurses5-dev wget pandoc libevent-dev \
-                     libreadline-dev python3-setuptools \
-		     libtool autoconf automake autotools-dev \
-		     pkg-config libev-dev qemu-kvm libvirt-bin \
-		     bridge-utils virtinst virt-manager \
-		     hugepages libgfortran3 libhugetlbfs-dev
+$ sudo apt install build-essential bison \
+		libncurses-dev flex libssl-dev automake \
+		libelf-dev libnuma-dev python3 git \
+		wget libncurses5-dev libevent-dev \
+		libreadline-dev libtool autoconf \
+		qemu-kvm libvirt-bin bridge-utils \
+		virtinst virt-manager hugepages \
+		libgfortran3 libhugetlbfs-dev
+
 ```                       
 
 Pre-Compiled Binaries

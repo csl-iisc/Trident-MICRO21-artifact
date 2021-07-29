@@ -11,16 +11,16 @@ curr_config = ""
 summary = []
 avg_summary = []
 benchmarks = []
-global verbose
 
 # --- all workload configurations
 configs = ['4KB', '2MBTHP', '2MBHUGE', '1GBHUGE', 'TRIDENT', 'TRIDENT-1G', \
-          'TRIDENT-NC', 'HAWKEYE', '2MBTHPF', 'TIDENTF', 'TRIDENT-1GF', \
-          'TRIDENT-NCF', 'HAWKEYEF', '4KB4KB', '2MBTHP2MBTHP', 'TRIDENTTRIDENT', \
-          'HAWKEYEHAWKEYE', '2MBTHP2MBTHPF', 'TRIDENTTRIDENTF', 'TRIDENTTRIDENTFPV']
+          'TRIDENT-NC', 'HAWKEYE', '2MBTHP-F', 'TRIDENT-F', 'TRIDENT-1G-F', \
+          'TRIDENT-NC-F', 'HAWKEYE-F', '4KB-4KB', '2MBTHP-2MBTHP', '1GBHUGE-1GBHUGE' \
+          'TRIDENT-TRIDENT', 'HAWKEYE-HAWKEYE', '2MBTHP-2MBTHP-F', 'TRIDENT-TRIDENT-F', \
+          'TRIDENTPV-TRIDENTPV-F']
 pretty_configs = ['4KB', '2MB-THP', '2MB-HUGE', '1GB-HUGE', 'Trident', 'Trident-1G', \
           'Trident-NC', 'HawkEye', '2MB-THP', 'Trident', 'Trident-1G', 'Trident-NC', \
-          'HawkEye', '4KB-4KB', '2MB+2MB', 'Trident+Trident', 'HawkEye+HawkEye', \
+          'HawkEye', '4KB+4KB', '2MB+2MB', '1GB+1GB', 'Trident+Trident', 'HawkEye+HawkEye', \
           '2MB+2MB', 'Trident+Trident', 'TridentPV+TridentPV']
 
 # --- all workloads
@@ -31,12 +31,14 @@ main_workloads = ['xsbench', 'gups', 'svm', 'redis', 'btree', 'graph500', \
           'memcached', 'canneal']
 
 fig1_configs = ['4KB', '2MBTHP', '2MBHUGE', '1GBHUGE']
-fig2_configs = ['4KB4KB', '2MBTHP2MBTHP', '1GBHUGE1GBHUGE']
+fig2_configs = ['4KB-4KB', '2MBTHP-2MBTHP', '1GBHUGE-1GBHUGE']
+fig7_configs = ['TRIDENT-F', 'TRIDENT-NC-F']
 fig9_configs = ['2MBTHP', 'HAWKEYE', 'TRIDENT']
 fig10_configs = fig9_configs
 fig11a_configs = ['2MBTHP', 'TRIDENT-1G', 'TRIDENT-NC', 'TRIDENT'] 
-fig11b_configs = ['2MBTHPF', 'TRIDENT-1GF', 'TRIDENT-NCF', 'TRIDENTF'] 
-fig12_configs = ['2MBTHP2MBTHP', 'HAWKEYEHAWKEYE', 'TRIDENTTRIDENT'] 
+fig11b_configs = ['2MBTHP-F', 'TRIDENT-1G-F', 'TRIDENT-NC-F', 'TRIDENT-F']
+fig12_configs = ['2MBTHP-2MBTHP', 'HAWKEYE-HAWKEYE', 'TRIDENT-TRIDENT']
+fig13_configs = ['2MBTHP-2MBTHP-F', 'TRIDENT-TRIDENT-F', 'TRIDENTPV-TRIDENTPV-F']
 
 def get_time_from_log(line):
     exec_time = int(line[line.find(":")+2:])
@@ -49,12 +51,9 @@ def open_file(src, op):
             raise ("Failed")
         return fd
     except:
-        if verbose:
-            #print("Unable to open %s in %s mode" %(src, op))
-            pass
         return None
 
-def print_workload_config(log):
+def update_workload_config(log):
     global curr_bench, curr_config
 
     for bench in workloads:
@@ -62,21 +61,44 @@ def print_workload_config(log):
             curr_bench = bench
             break
 
-    config = ""
+    config = ''
     for tmp in configs:
-            search_name = "-" + tmp + "-"
-            if search_name in log:
-                config =tmp
-                break
+        search_name = '--' + tmp + '--'
+        if search_name in log:
+            config = tmp
+            break
 
     curr_config = config
     benchmarks.append(curr_bench)
 
+def record_output(time, pwc, copy):
+    if time == -1:
+        return
+
+    output = {}
+    output['bench'] = curr_bench
+    output['config'] = curr_config
+    output['time'] = time
+    output['pwc'] = pwc
+    output['copy'] = copy
+    #print(output)
+    summary.append(output)
+
 def process_perf_log(path):
     fd = open_file(path, "r")
     if fd is None:
-        print ('error opening log file')
-        sys.exit(1)
+        return
+
+    if 'vmstat' in path:
+        copy0 = copy1 = -1
+        for line in fd:
+            if 'pgmigrate_success' in line:
+                if copy0 == -1:
+                    copy0 = int(line.split()[1])
+                else:
+                    copy1 = int(line.split()[1])
+        fd.close()
+        return (copy1 - copy0)
 
     exec_time = cycles = loads = stores = -1
     for line in fd:
@@ -88,27 +110,34 @@ def process_perf_log(path):
             loads = float(line.split(',')[0])
         if ',dtlb_store_misses.walk_active' in line:
             stores = float(line.split(',')[0])
-
     fd.close()
-    # --- log may be from an incomplete run and if so, ignore
-    if exec_time == -1:
-        return
 
-    output = {}
-    output['bench'] = curr_bench
-    output['config'] = curr_config
-    output['time'] = exec_time
-    output['pwc'] = round((((loads + stores) * 100)/cycles), 2)
-    print(output)
-    summary.append(output)
+    pwc = round((((loads + stores) * 100)/cycles), 2)
+    if exec_time == -1 or curr_config == '':
+        return (-1, -1)
+
+    return (exec_time, pwc)
+    #record_output(exec_time, pwc, 0)
+    #output = {}
+    #output['bench'] = curr_bench
+    #output['config'] = curr_config
+    #output['time'] = exec_time
+    #output['pwc'] = round((((loads + stores) * 100)/cycles), 2)
+    #print(output)
+    #summary.append(output)
  
 def traverse_benchmark(path):
     # --- process THP and NON-THP configs separately
     for root,dir,files in os.walk(path):
+        time = pwc = copy = -1
         for filename in files:
             log = os.path.join(root, filename)
-            print_workload_config(log)
-            process_perf_log(log)
+            update_workload_config(log)
+            if 'vmstat' in log:
+                copy = process_perf_log(log)
+            else:
+                (time, pwc) = process_perf_log(log)
+        record_output(time, pwc, copy)
 
 def pretty(name):
     if name in configs:
@@ -170,40 +199,44 @@ def gen_csv_common(dst, benchs, confs, baseline, metric):
                 if exp['bench'] == workload and exp['config'] == config:
                     writer.writerow([workload, pretty_configs[configs.index(config)], round(exp[metric] / denominator, 2)])
 
-
 def gen_fig1_csv(root):
-    out_csv = os.path.join(root, ('report/figure-1a.csv'))
+    out_csv = os.path.join(root, 'report/figure-1a.csv')
     gen_csv_common(out_csv, workloads, fig1_configs, '4KB', 'time')
-    out_csv = os.path.join(root, ('report/figure-1b.csv'))
+    out_csv = os.path.join(root, 'report/figure-1b.csv')
     gen_csv_common(out_csv, workloads, fig1_configs, '4KB', 'pwc')
 
 def gen_fig2_csv(root):
-    out_csv = os.path.join(root, ('report/figure-2a.csv'))
+    out_csv = os.path.join(root, 'report/figure-2a.csv')
     gen_csv_common(out_csv, workloads, fig2_configs, '4KB-4KB', 'time')
-    out_csv = os.path.join(root, ('report/figure-2b.csv'))
+    out_csv = os.path.join(root, 'report/figure-2b.csv')
     gen_csv_common(out_csv, workloads, fig2_configs, '4KB-4KB', 'pwc')
 
 def gen_fig9_csv(root):
-    out_csv = os.path.join(root, ('report/figure-9a.csv'))
+    out_csv = os.path.join(root, 'report/figure-9a.csv')
     gen_csv_common(out_csv, main_workloads, fig9_configs, '2MBTHP', 'time')
-    out_csv = os.path.join(root, ('report/figure-9b.csv'))
+    out_csv = os.path.join(root, 'report/figure-9b.csv')
     gen_csv_common(out_csv, main_workloads, fig9_configs, '2MBTHP', 'pwc')
 
 def gen_fig10_csv(root):
-    out_csv = os.path.join(root, ('report/figure-10a.csv'))
-    gen_csv_common(out_csv, main_workloads, fig10_configs, '2MBTHPF', 'time')
-    out_csv = os.path.join(root, ('report/figure-10b.csv'))
-    gen_csv_common(out_csv, main_workloads, fig10_configs, '2MBTHPF', 'pwc')
+    out_csv = os.path.join(root, 'report/figure-10a.csv')
+    gen_csv_common(out_csv, main_workloads, fig10_configs, '2MBTHP-F', 'time')
+    out_csv = os.path.join(root, 'report/figure-10b.csv')
+    gen_csv_common(out_csv, main_workloads, fig10_configs, '2MBTHP-F', 'pwc')
 
 def gen_fig11_csv(root):
-    out_csv = os.path.join(root, ('report/figure-11a.csv'))
+    out_csv = os.path.join(root, 'report/figure-11a.csv')
     gen_csv_common(out_csv, main_workloads, fig11a_configs, '2MBTHP', 'time')
-    out_csv = os.path.join(root, ('report/figure-11b.csv'))
-    gen_csv_common(out_csv, main_workloads, fig11b_configs, '2MBTHPF', 'time')
+    out_csv = os.path.join(root, 'report/figure-11b.csv')
+    gen_csv_common(out_csv, main_workloads, fig11b_configs, '2MBTHP-F', 'time')
 
 def gen_fig12_csv(root):
-    out_csv = os.path.join(root, ('report/figure-12.csv'))
-    gen_csv_common(out_csv, main_workloads, fig12_configs, '2MBTHP2MBTHP', 'time')
+    out_csv = os.path.join(root, 'report/figure-12.csv')
+    gen_csv_common(out_csv, main_workloads, fig12_configs, '2MBTHP-2MBTHP', 'time')
+
+def gen_fig7_csv(root):
+    out_csv = os.path.join(root, 'report/figure-7.csv')
+    gen_csv_common(out_csv, main_workloads, fig7_configs, 'TRIDENT-NC', 'copy')
+
 
 def gen_report(root):
     gen_fig1_csv(root)
@@ -212,6 +245,7 @@ def gen_report(root):
     gen_fig10_csv(root)
     gen_fig11_csv(root)
     gen_fig12_csv(root)
+    gen_fig7_csv(root)
 
 if __name__=="__main__":
     summary = []

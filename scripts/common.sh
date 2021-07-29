@@ -68,7 +68,7 @@ prepare_paths()
         fi
         # where to put the output file (based on CONFIG)
         DATADIR=$ROOT"/evaluation/$BENCHMARK"
-        RUNDIR=$DATADIR/$(hostname)-$BENCHMARK-$CONFIG-$(date +"%Y%m%d-%H%M%S")
+        RUNDIR=$DATADIR/$(hostname)-$BENCHMARK--$CONFIG--$(date +"%Y%m%d-%H%M%S")
         mkdir -p $RUNDIR
         if [ $? -ne 0 ]; then
                 echo "Error creating output directory: $RUNDIR"
@@ -109,6 +109,7 @@ setup_trident_configs()
         echo 5 |  sudo tee /proc/sys/vm/smart_compaction_retries 2>&1
         echo 2097152 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/pages_to_scan > /dev/null 2>&1
 	echo 0 | sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/collapse_via_hypercall > /dev/null 2>&1
+	echo 0 | sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/max_cpu > /dev/null 2>&1
 }
 
 setup_trident_nosmart_configs()
@@ -129,6 +130,7 @@ setup_tridentpv_configs()
 {
 	setup_trident_configs
 	echo 1 | sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/collapse_via_hypercall > /dev/null 2>&1
+	echo 10 | sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/max_cpu > /dev/null 2>&1
 }
 
 setup_2mbthp_configs()
@@ -199,6 +201,7 @@ cleanup_system_configs()
         # --- Drain HUGETLB Pool
 	echo 0 | sudo tee $PREFIX/hugepages-2048kB/nr_hugepages
 	echo 0 | sudo tee $PREFIX/hugepages-1048576kB/nr_hugepages
+	echo 0 | sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/max_cpu > /dev/null 2>&1
 }
 
 launch_workload()
