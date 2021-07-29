@@ -10,6 +10,7 @@ fi
 SCRIPTS=$(dirname `readlink -f "$0"`)
 ROOT="$(dirname "$SCRIPTS")"
 source $SCRIPTS/common.sh
+source $SCRIPTS/configs.sh
 
 cleanup_system_configs
 setup_4KB_configs # --- setup everything with normal system config

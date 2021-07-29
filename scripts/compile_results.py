@@ -197,7 +197,14 @@ def gen_csv_common(dst, benchs, confs, baseline, metric):
         for config in confs:
             for exp in avg_summary:
                 if exp['bench'] == workload and exp['config'] == config:
-                    writer.writerow([workload, pretty_configs[configs.index(config)], round(exp[metric] / denominator, 2)])
+                    if denominator == 0:
+                        val = 'XXX'
+                    else:
+                        if metric == 'time':
+                            val = round(1 / (exp[metric] / denominator), 2)
+                        else:
+                            val = round(exp[metric] / denominator, 2)
+                    writer.writerow([workload, pretty_configs[configs.index(config)], val])
 
 def gen_fig1_csv(root):
     out_csv = os.path.join(root, 'report/figure-1a.csv')

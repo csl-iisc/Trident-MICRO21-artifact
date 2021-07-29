@@ -13,10 +13,6 @@ GAPBS_ARGS=" -g 29 -n 20 -i 20"
 DATA_NODE=0
 CPU_NODE=0
 
-# number of hugetlb pages
-HUGETLB_2MB_PAGES=80000
-HUGETLB_1GB_PAGES=160
-
 drop_caches()
 {
 	echo "Dropping caches for config: $CONFIG"
@@ -198,8 +194,8 @@ prepare_system_configs()
 cleanup_system_configs()
 {
         # --- Drain HUGETLB Pool
-	echo 0 | sudo tee $PREFIX/hugepages-2048kB/nr_hugepages
-	echo 0 | sudo tee $PREFIX/hugepages-1048576kB/nr_hugepages
+	echo 0 | sudo tee $PREFIX/hugepages-2048kB/nr_hugepages > /dev/null 2>&1
+	echo 0 | sudo tee $PREFIX/hugepages-1048576kB/nr_hugepages > /dev/null 2>&1
 	echo 0 | sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/max_cpu > /dev/null 2>&1
 }
 
