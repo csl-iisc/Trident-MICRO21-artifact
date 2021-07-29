@@ -11,7 +11,7 @@ source $SCRIPTS/configs.sh
 for BENCHMARK in $BENCHMARKS; do
 	for CONFIG in $CONFIGS; do
 		cleanup_system_configs
-		setup_4KB_configs
+		setup_4kb_configs
 		drop_caches
 		prepare_system_configs
 		prepare_kvm_vm

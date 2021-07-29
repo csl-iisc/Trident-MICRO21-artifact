@@ -166,7 +166,6 @@ setup_4kb_configs()
 PREFIX='/sys/devices/system/node/node0/hugepages/'
 prepare_system_configs()
 {
-        CONFIG=$1
         # --- reserve/drain HUGETLB Pool
 	if [ $CONFIG = "2MBHUGE" ]; then
 		echo $HUGETLB_2MB_PAGES | sudo tee $PREFIX/hugepages-2048kB/nr_hugepages
