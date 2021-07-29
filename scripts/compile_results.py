@@ -146,12 +146,13 @@ def pretty(name):
     return name
 
 def dump_workload_config_average(output, bench, config, fd, fd2, absolute):
-    time = count = pwc = 0
+    time = count = pwc = copy = 0
     for result in output:
         if result['bench'] == bench and result['config'] == config:
             time += result['time']
             pwc += result['pwc']
-            line = '%s\t%s\t%d\t%0.2f\n' % (pretty(bench), pretty(config), result['time'], result['pwc'])
+            copy += int(result['copy'])
+            line = '%s\t%s\t%d\t%0.2f\t%d\n' % (bench, pretty(config), result['time'], result['pwc'], result['pwc'])
             fd2.write(line)
             count += 1
 
@@ -161,13 +162,15 @@ def dump_workload_config_average(output, bench, config, fd, fd2, absolute):
     if absolute:
             time = int (time / count)
             pwc = float (pwc / count)
-            line = '%s\t%s\t%d\t%0.2f\n' % (pretty(bench), pretty(config), time, pwc)
+            copy = int (copy / count)
+            line = '%s\t%s\t%d\t%0.2f\t%d\n' % (bench, pretty(config), time, pwc, copy)
             fd.write(line)
             output = {}
             output['bench'] = bench
             output['config'] = config
             output['time'] = time
             output['pwc'] = pwc
+            output['copy'] = copy
             avg_summary.append(output)
 
 def process_all_runs(fd, fd2, output, absolute):
