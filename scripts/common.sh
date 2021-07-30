@@ -13,10 +13,12 @@ GAPBS_ARGS=" -g 29 -n 20 -i 20"
 DATA_NODE=0
 CPU_NODE=0
 
+
+COUT="/dev/null"
 drop_caches()
 {
 	echo "Dropping caches for config: $CONFIG"
-	echo 3 |  sudo tee /proc/sys/vm/drop_caches > /dev/null
+	echo 3 |  sudo tee /proc/sys/vm/drop_caches > $COUT
 }
 
 fragment_memory()
@@ -28,17 +30,17 @@ fragment_memory()
                         exit
                 fi
                 echo -e "Reading first file"
-                $ROOT/bin/numactl -c $CPU_NODE -m $DATA_NODE cat $FRAG_FILE_1 > /dev/null &
+                $ROOT/bin/numactl -c $CPU_NODE -m $DATA_NODE cat $FRAG_FILE_1 > $COUT &
                 PID_1=$!
                 echo -e "Reading second file"
-                $ROOT/bin/numactl -c $CPU_NODE -m $DATA_NODE cat $FRAG_FILE_2 > /dev/null &
+                $ROOT/bin/numactl -c $CPU_NODE -m $DATA_NODE cat $FRAG_FILE_2 > $COUT &
                 PID_2=$!
                 echo "Waiting for files to load in memory: PID1: $PID_1 PID2: $PID_2"
                 wait $PID_1
                 wait $PID_2
                 echo -e "Launching client to fragment memory...."
                 # --- Run for 10 minutes
-                $ROOT/bin/numactl -c $CPU_NODE -m $DATA_NODE python $SCRIPTS/fragment.py $FRAG_FILE_1 $FRAG_FILE_2 600 36 > /dev/null
+                $ROOT/bin/numactl -c $CPU_NODE -m $DATA_NODE python $SCRIPTS/fragment.py $FRAG_FILE_1 $FRAG_FILE_2 600 36 > $COUT
         else
 		drop_caches
         fi
@@ -95,68 +97,68 @@ prepare_args()
 setup_trident_configs()
 {
         THP="always"
-        echo $THP |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled > /dev/null 2>&1
-        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/defrag > /dev/null 2>&1
-        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_pmd > /dev/null 2>&1
-        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_pud > /dev/null 2>&1
-        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/khugepaged_collapse_pmd > /dev/null 2>&1
-        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/khugepaged_collapse_pud > /dev/null 2>&1
-        echo 1 |  sudo tee /proc/sys/vm/compaction_smart > /dev/null 2>&1
-        echo 5 |  sudo tee /proc/sys/vm/smart_compaction_retries 2>&1
-        echo 2097152 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/pages_to_scan > /dev/null 2>&1
-	echo 0 | sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/collapse_via_hypercall > /dev/null 2>&1
-	echo 0 | sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/max_cpu > /dev/null 2>&1
+        echo $THP |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled > $COUT 2>&1
+        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/defrag > $COUT 2>&1
+        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_pmd > $COUT 2>&1
+        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_pud > $COUT 2>&1
+        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/khugepaged_collapse_pmd > $COUT 2>&1
+        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/khugepaged_collapse_pud > $COUT 2>&1
+        echo 1 |  sudo tee /proc/sys/vm/compaction_smart > $COUT 2>&1
+        echo 5 |  sudo tee /proc/sys/vm/smart_compaction_retries > $COUT 2>&1
+        echo 2097152 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/pages_to_scan > $COUT 2>&1
+	echo 0 | sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/collapse_via_hypercall > $COUT 2>&1
+	echo 0 | sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/max_cpu > $COUT 2>&1
 }
 
 setup_trident_nosmart_configs()
 {
 	setup_trident_configs
-        echo 0 |  sudo tee /proc/sys/vm/compaction_smart > /dev/null 2>&1
-        echo 1 |  sudo tee /proc/sys/vm/smart_compaction_retries 2>&1
+        echo 0 |  sudo tee /proc/sys/vm/compaction_smart > $COUT 2>&1
+        echo 1 |  sudo tee /proc/sys/vm/smart_compaction_retries > $COUT 2>&1
 }
 
 setup_trident_1gbonly_configs()
 {
 	setup_trident_configs
-        echo 0 |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_pmd > /dev/null 2>&1
-        echo 0 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/khugepaged_collapse_pmd > /dev/null 2>&1
+        echo 0 |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_pmd > $COUT 2>&1
+        echo 0 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/khugepaged_collapse_pmd > $COUT 2>&1
 }
 
 setup_tridentpv_configs()
 {
 	setup_trident_configs
-	echo 1 | sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/collapse_via_hypercall > /dev/null 2>&1
-	echo 10 | sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/max_cpu > /dev/null 2>&1
+	echo 1 | sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/collapse_via_hypercall > $COUT 2>&1
+	echo 10 | sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/max_cpu > $COUT 2>&1
 }
 
 setup_2mbthp_configs()
 {
         THP="always"
-        echo $THP |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled > /dev/null 2>&1 
-        echo never |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_1gb > /dev/null 2>&1
-        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/defrag > /dev/null 2>&1
-        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_pmd > /dev/null 2>&1
-        echo 0 |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_pud > /dev/null 2>&1
-        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/khugepaged_collapse_pmd > /dev/null 2>&1
-        echo 0 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/khugepaged_collapse_pud > /dev/null 2>&1
-        echo 0 |  sudo tee /proc/sys/vm/compaction_smart > /dev/null 2>&1
+        echo $THP |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled > $COUT 2>&1 
+        echo never |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_1gb > $COUT 2>&1
+        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/defrag > $COUT 2>&1
+        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_pmd > $COUT 2>&1
+        echo 0 |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_pud > $COUT 2>&1
+        echo 1 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/khugepaged_collapse_pmd > $COUT 2>&1
+        echo 0 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/khugepaged_collapse_pud > $COUT 2>&1
+        echo 0 |  sudo tee /proc/sys/vm/compaction_smart > $COUT 2>&1
         #echo 5 |  sudo tee /proc/sys/vm/smart_compaction_retries
-        echo 4096 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/pages_to_scan > /dev/null 2>&1
+        echo 4096 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/pages_to_scan > $COUT 2>&1
 }
 
 setup_4kb_configs()
 {
         THP="never"
-        echo $THP |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled > /dev/null 2>&1
-        echo $THP |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_1gb > /dev/null 2>&1
-        echo 0 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/defrag > /dev/null 2>&1
-        echo 0 |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_pmd > /dev/null 2>&1
-        echo 0 |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_pud > /dev/null 2>&1
-        echo 0 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/khugepaged_collapse_pmd > /dev/null 2>&1
-        echo 0 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/khugepaged_collapse_pud > /dev/null 2>&1
-        echo 0 |  sudo tee /proc/sys/vm/compaction_smart > /dev/null 2>&1
+        echo $THP |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled > $COUT 2>&1
+        echo $THP |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_1gb > $COUT 2>&1
+        echo 0 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/defrag > $COUT 2>&1
+        echo 0 |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_pmd > $COUT 2>&1
+        echo 0 |  sudo tee /sys/kernel/mm/transparent_hugepage/enabled_pud > $COUT 2>&1
+        echo 0 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/khugepaged_collapse_pmd > $COUT 2>&1
+        echo 0 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/khugepaged_collapse_pud > $COUT 2>&1
+        echo 0 |  sudo tee /proc/sys/vm/compaction_smart > $COUT 2>&1
         #echo 5 |  sudo tee /proc/sys/vm/smart_compaction_retries
-        echo 4096 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/pages_to_scan > /dev/null 2>&1
+        echo 4096 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/pages_to_scan > $COUT 2>&1
 }
 
 PREFIX='/sys/devices/system/node/node0/hugepages/'
@@ -170,7 +172,7 @@ prepare_system_configs()
 	fi
 	# reserve hugetlb pages
         $ROOT/bin/numactl -m $DATA_NODE echo $NR_HUGETLB_PAGES |
-		sudo tee /proc/sys/vm/nr_hugepages_mempolicy > /dev/null 2>&1
+		sudo tee /proc/sys/vm/nr_hugepages_mempolicy > $COUT 2>&1
         if [[ $CONFIG = *2MB* ]]; then
                 setup_2mbthp_configs
         elif [[ $CONFIG = *HAWKEYE* ]]; then
@@ -194,17 +196,17 @@ prepare_system_configs()
 cleanup_system_configs()
 {
         # --- Drain HUGETLB Pool
-	echo 0 | sudo tee $PREFIX/hugepages-2048kB/nr_hugepages > /dev/null 2>&1
-	echo 0 | sudo tee $PREFIX/hugepages-1048576kB/nr_hugepages > /dev/null 2>&1
-	echo 0 | sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/max_cpu > /dev/null 2>&1
+	echo 0 | sudo tee $PREFIX/hugepages-2048kB/nr_hugepages > $COUT 2>&1
+	echo 0 | sudo tee $PREFIX/hugepages-1048576kB/nr_hugepages > $COUT 2>&1
+	echo 0 | sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/max_cpu > $COUT 2>&1
 }
 
 launch_workload()
 {
         # --- clean up exisiting state/processes
-        rm /tmp/alloctest-bench.ready &>/dev/null
-        rm /tmp/alloctest-bench.done &> /dev/null
-	echo -1 | sudo tee /proc/sys/kernel/perf_event_paranoid > /dev/null
+        rm /tmp/alloctest-bench.ready &>$COUT
+        rm /tmp/alloctest-bench.done &> $COUT
+	echo -1 | sudo tee /proc/sys/kernel/perf_event_paranoid > $COUT
         CMD_PREFIX=$NUMACTL
         if [ $CONFIG = "2MBHUGE" ] || [ $CONFIG = "1GBHUGE" ]; then
                 #CMD_PREFIX=" LD_PRELOAD=libhugetlbfs.so HUGETLB_MORECORE=2M $NUMACTL"
@@ -212,7 +214,7 @@ launch_workload()
         fi
         CMD_PREFIX+=" -m $DATA_NODE -c $CPU_NODE "
         LAUNCH_CMD="$CMD_PREFIX $BENCHPATH $BENCH_ARGS"
-        REDIRECT="/dev/null"
+        REDIRECT="$COUT"
         echo $LAUNCH_CMD
         touch $OUTFILE
         cat /proc/vmstat | egrep 'migrate|th' >> $RUNDIR/vmstat
@@ -222,7 +224,7 @@ launch_workload()
         BENCHMARK_PID=$!
         if [ $CONFIG = "HAWKEYE" ]; then
                 sleep 1
-                $ROOT/bin/notify_hawkeye -p $BENCHMARK_PID > /dev/null 2>&1
+                $ROOT/bin/notify_hawkeye -p $BENCHMARK_PID > $COUT 2>&1
                 echo "Added PID: $BENCHMARK_PID to HawkEye Scan List..."        
         fi
         SECONDS=0
@@ -233,7 +235,7 @@ launch_workload()
         INIT_DURATION=$SECONDS
         if [ $CONFIG = "2MBR" ] || [ $CONFIG = "1GBTR" ]; then
                 echo "Launching Interference on NODE: 0 ..."
-                $ROOT/bin/numactl -c 0 -m 0 $INTERFERENCEPATH > /dev/null 2>&1 &
+                $ROOT/bin/numactl -c 0 -m 0 $INTERFERENCEPATH > $COUT 2>&1 &
         fi
         echo -e "Initialization Time (seconds): $INIT_DURATION"
         SECONDS=0
@@ -248,10 +250,10 @@ launch_workload()
         echo -e "Execution Time (seconds): $DURATION" >> $OUTFILE
         echo -e "Execution Time (seconds): $DURATION"
         echo -e "Initialization Time (seconds): $INIT_DURATION\n" >> $OUTFILE
-        kill -INT $PERF_PID &> /dev/null
+        kill -INT $PERF_PID &> $COUT
         wait $PERF_PID
         cat /proc/vmstat | egrep 'migrate|th' >> $RUNDIR/vmstat
-        wait $BENCHMARK_PID 2>/dev/null
+        wait $BENCHMARK_PID 2>$COUT
 }
 
 copy_vm_config()
@@ -271,16 +273,16 @@ copy_vm_config()
 shutdown_kvm_vm()
 {
 	echo "Trying normal shutdown..."
-	ssh $GUESTUSER@$GUESTIP 'sudo shutdown now' > /dev/null
+	ssh $GUESTUSER@$GUESTIP 'sudo shutdown now' > $COUT
 	sleep 5
-	virsh destroy $VMIMAGE > /dev/null 2>&1
+	virsh destroy $VMIMAGE > $COUT 2>&1
 	sleep 1
 	echo "VM stopped..."
 }
 
 boot_kvm_vm()
 {
-	virsh start $VMIMAGE > /dev/null
+	virsh start $VMIMAGE > $COUT
 	if [ $? -ne 0 ]; then
 		echo "error starting vm. Exiting."
 		exit

@@ -4,3 +4,4 @@ datasets/fragmentation
 vmconfigs/*.xml
 evaluation/*
 report/*
+test/*

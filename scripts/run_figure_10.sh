@@ -1,9 +1,9 @@
 #!/bin/bash
 
 BENCHMARKS="xsbench gups svm redis btree graph500 memcached canneal"
-CONFIGS="2MBTHPF TRIDENTF" #HAWKEYEF
-# -- For HAWKEYEF, boot system with HawkEye and uncomment the following line
-#CONFIGS="HAWKEYEF"
+CONFIGS="2MBTHP-F TRIDENT-F" #HAWKEYE-F
+# -- For HAWKEYE-F, boot system with HawkEye and uncomment the following line
+#CONFIGS="HAWKEYE-F"
 
 SCRIPTS=$(dirname `readlink -f "$0"`)
 ROOT="$(dirname "$SCRIPTS")"
