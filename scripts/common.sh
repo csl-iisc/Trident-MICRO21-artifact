@@ -161,14 +161,15 @@ setup_4kb_configs()
         echo 4096 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/pages_to_scan > $COUT 2>&1
 }
 
-PREFIX='/sys/devices/system/node/node0/hugepages/'
+MBSYSCTL='/sys/devices/system/node/node0/hugepages/hugepages-2048kB/nr_hugepages'
+GBSYSCTL='/sys/devices/system/node/node0/hugepages/hugepages-1048576kB/nr_hugepages'
 prepare_system_configs()
 {
         # --- reserve/drain HUGETLB Pool
-	if [ $CONFIG = "2MBHUGE" ]; then
-		echo $HUGETLB_2MB_PAGES | sudo tee $PREFIX/hugepages-2048kB/nr_hugepages
-	elif [ $CONFIG = "1GBHUGE" ]; then
-		echo $HUGETLB_1GB_PAGES | sudo tee $PREFIX/hugepages-1048576kB/nr_hugepages
+	if [[ $CONFIG = *2MBHUGE* ]]; then
+		echo $HUGETLB_2MB_PAGES | sudo tee $MBSYSCTL > $COUT 2>&1
+	elif [[ $CONFIG = *1GBHUGE* ]]; then
+		echo $HUGETLB_1GB_PAGES | sudo tee $GBSYSCTL > $COUT 2>&1
 	fi
 	# reserve hugetlb pages
         $ROOT/bin/numactl -m $DATA_NODE echo $NR_HUGETLB_PAGES |
@@ -196,8 +197,8 @@ prepare_system_configs()
 cleanup_system_configs()
 {
         # --- Drain HUGETLB Pool
-	echo 0 | sudo tee $PREFIX/hugepages-2048kB/nr_hugepages > $COUT 2>&1
-	echo 0 | sudo tee $PREFIX/hugepages-1048576kB/nr_hugepages > $COUT 2>&1
+	echo 0 | sudo tee $MBSYSCTL > $COUT 2>&1
+	echo 0 | sudo tee $GBSYSCTL > $COUT 2>&1
 	echo 0 | sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/max_cpu > $COUT 2>&1
 }
 
@@ -259,10 +260,12 @@ launch_workload()
 copy_vm_config()
 {
 	VMXML=$ROOT/vmconfigs/4KB.xml # -- same XML works for 2MBTHP and HAWKEYE as well
-	if [ $CONFIG = "2MBHUGE" ]; then
+	if [[ $CONFIG = *2MBHUGE* ]]; then
 		VMXML=$ROOT/vmconfigs/2MBHUGE.xml
-	elif [ $CONFIG = "1GBHUGE" ]; then
+	elif [[ $CONFIG = *1GBHUGE* ]]; then
 		VMXML=$ROOT/vmconfigs/1GBHUGE.xml
+	elif [[ $CONFIG = *HAWKEYE* ]]; then
+		VMXML=$ROOT/vmconfigs/HAWKEYE.xml
 	fi
 	sudo service libvirtd stop
 	sudo cp $VMXML /etc/libvirt/qemu/$VMIMAGE.xml
@@ -272,7 +275,7 @@ copy_vm_config()
 
 shutdown_kvm_vm()
 {
-	echo "Trying normal shutdown..."
+	echo "Shutting down VM..."
 	ssh $GUESTUSER@$GUESTIP 'sudo shutdown now' > $COUT
 	sleep 5
 	virsh destroy $VMIMAGE > $COUT 2>&1
@@ -287,8 +290,8 @@ boot_kvm_vm()
 		echo "error starting vm. Exiting."
 		exit
 	fi
-	echo "VM started..."
-	sleep 45
+	echo "VM started....waiting to log in"
+	sleep 90
 }
 
 prepare_kvm_vm()

@@ -59,40 +59,40 @@ def test_and_set_hpb(tag):
 # Rewrite to boot with mitosis kernel image
 def rewrite_os(config, tag):
     #new = new_element(tag_os, 'kernel', '/boot/vmlinuz-4.17.0-mitosis+')
-    addKernel = True
-    addInitrd = True
-    addCmdline = True
+    addKernel = addInitrd = addCmdline = True
 
     cmdline_postfix = ''
+    kernel = KERNEL_TRIDENT
+    initrd = INITRD_TRIDENT
+
     if config == '2MBHUGE':
         cmdline_postfix = CMDLINE_2MBHUGE_POSTFIX
     if config == '1GBHUGE':
         cmdline_postfix = CMDLINE_1GBHUGE_POSTFIX
+    if config == 'HAWKEYE':
+        kernel = KERNEL_HAWKEYE
+        initrd = INITRD_HAWKEYE
+
+
+    cmdline = CMDLINE_TRIDENT + cmdline_postfix
 
     for child in tag:
         if child.tag == 'kernel':
-            child.text = KERNEL_TRIDENT
-            if config == 'HAWKEYE':
-                child.text = KERNEL_HAWKEYE
+            child.text = kernel
             addKernel = False
         if child.tag == 'initrd':
-            child.text = INITRD_TRIDENT
-            if config == 'HAWKEYE':
-                child.text = INITRD_HAWKEYE
+            child.text = initrd
             addInitrd = False
         if child.tag == 'cmdline':
-            child.text = CMDLINE_TRIDENT
-            child.text += cmdline_postfix
+            child.text = cmdline
             addCmdline = False
-        #if child.tag == 'type':
-        #    test_and_set_hpb(child)
 
     if addKernel:
-        newtag = new_element(tag, 'kernel', KERNEL_TRIDENT)
+        newtag = new_element(tag, 'kernel', kernel)
     if addInitrd:
-        newtag = new_element(tag, 'initrd', INITRD_TRIDENT)
+        newtag = new_element(tag, 'initrd', initrd)
     if addCmdline:
-        newtag = new_element(tag, 'cmdline', CMDLINE_TRIDENT)
+        newtag = new_element(tag, 'cmdline', cmdline)
 
 # Bind vCPUs 1:1: to pCPUs
 def add_vcpu_numa_tune(config, main, child):

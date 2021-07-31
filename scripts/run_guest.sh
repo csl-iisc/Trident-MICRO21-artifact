@@ -13,7 +13,7 @@ source $SCRIPTS/common.sh
 source $SCRIPTS/configs.sh
 
 cleanup_system_configs
-setup_4KB_configs # --- setup everything with normal system config
+setup_4kb_configs # --- setup everything with normal system config
 fragment_memory
 prepare_args
 prepare_system_configs
