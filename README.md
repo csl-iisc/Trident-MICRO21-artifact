@@ -37,7 +37,7 @@ The scripts and binaries are tested on Ubuntu 18.04 LTS. Other
 Linux distributions may work, but are not tested.
 
 In addition to the packages shipped with Ubuntu 18.04 LTS the following 
-packets are required:
+packages are required:
 
 ```
 $ sudo apt install build-essential bison bc \
