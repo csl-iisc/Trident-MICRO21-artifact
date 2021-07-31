@@ -8,7 +8,7 @@ Micro-architectural Resources for All Page Sizes in x86 Processors **.
 Authors
 -------
  
- * Venkat Sai Ram (Indian Institute of Science)
+ * Venkat Sri Sai Ram (Indian Institute of Science)
  * Ashish Panwar (Indian Institute of Science)
  * Arkaprava Basu (Indian Institute of Science)
 
