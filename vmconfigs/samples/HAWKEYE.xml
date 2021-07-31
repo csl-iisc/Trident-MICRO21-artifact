@@ -33,7 +33,7 @@
   </cputune>
   <os>
     <type arch="x86_64" machine="pc-i440fx-bionic">hvm</type>
-    <kernel>/boot/vmlinuz-4.17.3-HawkEye+</kernel>
+    <kernel>/boot/vmlinuz-4.3.0-HawkEye+</kernel>
     <initrd>/boot/initrd.img-4.3.0-HawkEye+</initrd>
     <cmdline>console=ttyS0 root=/dev/sda1 </cmdline>
     <boot dev="hd"/>
