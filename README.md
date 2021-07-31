@@ -21,16 +21,14 @@ Directory Structure
  * `scripts/` contains scripts to run the experiments
  * `evaluation/` experimental logs are redirected here
  * `vmconfigs/` stores libvirt's XML configuration files
- * `report/` will contain process logs in CSV format
+ * `report/` will contain processed logs in CSV format
 
 
 Hardware Dependencies
 ---------------------
 
-Some of the workingset sizes of the workloads are hardcoded in the binaries.
-To run them, you need to have a machine with at least 128GB memory on a single
-socket.
-
+We recommend an Intel Skylake node with 18 cores (36 threads) and 192GB memory.
+Other x86_64 servers with similar memory and compute capability should produce comparable results.
 
 Software Dependencies
 ---------------------
@@ -53,17 +51,6 @@ $ sudo apt install build-essential bison bc \
 
 ```                       
 
-Pre-Compiled Binaries
----------------------
-
-If you only plan to use the pre-compiled binaries, install Trident kernel headers and image, and
-boot your target machine with it before running any experiments.
-
-```
-$ dpkg -i bin/linux-headers-4.17.3-trident+_4.17.3-trident+-3_amd64.deb
-$ dpkg -i bin/linux-image-4.17.3-trident+_4.17.3-trident+-3_amd64.deb
-```
-
 Obtaining Source Code and Compile
 ---------------------------------
 
@@ -75,20 +62,23 @@ $ cd Trident-MICRO21-artifact
 $ git submodule init
 $ git submodule update
 ```
+
 To compile Trident, do:
 
 ```
-$ cd Trident-MICRO21-artifact/sources/Trident; git checkout trident
-$ cp config .config; make oldconfig
-$ make -j; make install -j; update-grub;
+$ cd sources/Trident
+$ git fetch -all; git checkout trident
+$ make menuconfig; make -j $(nproc)
+$ sudo make modules_install; sudo make install
 ```
 
 To compile HawkEye, do:
 
 ```
-$ cd Trident-MICRO21-artifact/sources/HawkEye; git checkout hawkeye
-$ cp config .config; make oldconfig
-$ make -j; make install -j; update-grub;
+$ cd sources/HawkEye;
+$ git fetch -all; git checkout hawkeye
+$ make menuconfig; make -j $(nproc)
+$ sudo make modules_install; sudo make install
 ```
 
 Install and Create Virtual Machine Configurations
@@ -97,20 +87,21 @@ Install and Create Virtual Machine Configurations
 Install a virtual machine using command line (choose ssh-server when prompted for package installation):
 
 ```
-$ virt-install --name trident --ram 8192 --disk path=/home/ashish/vms/trident.qcow2,size=60 --vcpus 8 --os-type linux --os-variant generic --network bridge=virbr0 --graphics none --console pty,target_type=serial --location 'http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/' --extra-args 'console=ttyS0,115200n8 serial'
+$ virt-install --name trident --ram 8192 --disk path=/home/venkat/vms/trident.qcow2,size=60 --vcpus 8 --os-type linux --os-variant generic --network bridge=virbr0 --graphics none --console pty,target_type=serial --location 'http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/' --extra-args 'console=ttyS0,115200n8 serial'
 ```
 Once installed, use the following script to prepare VM configuration files:
 ```
-$ Trident-MICRO21-artifact/scripts/gen_vmconfigs.py trident
+$ scripts/gen_vmconfigs.py trident
 
 ```
 If it works well, skip the rest of this subsection. Otherwise you may have to manually create VM configurations following the instructions provided below.
 
-Copy the default XML configuration file in three files under `Trident-MICRO21-artifact/vmconfigs/`:
+Copy the default XML configuration file in four files under `vmconfigs/`:
 ```
 $ virsh dumpxml trident > Trident-MICRO21-artifact/vmconfigs/4KB.xml
 $ virsh dumpxml trident > Trident-MICRO21-artifact/vmconfigs/2MBHUGE.xml
 $ virsh dumpxml trident > Trident-MICRO21-artifact/vmconfigs/1GBHUGE.xml
+$ virsh dumpxml trident > Trident-MICRO21-artifact/vmconfigs/HAWKEYE.xml
 ```
 
 Now, update each configuration file to configure the number of vCPUs, memory and NUMA-topology as follows:
@@ -138,6 +129,17 @@ with the "os" tag in the XML files as follows:
 Add `default_hugepagesz=2M` and `default_hugepagesz=1G` to cmdline attribute in 2MBHUGE.xml
 and 1GBHUGE.xml respectively.
 
+To boot the VM with HawkEye kernel, add the following "os" tag in `vmconfigs/HAWKEYE.xml`:
+```
+  <os>
+    <type arch='x86_64' machine='pc-i440fx-eoan'>hvm</type>
+    <kernel>/boot/vmlinuz-4.3.0-HawkEye+</kernel>
+    <initrd>/boot/initrd.img-4.3.0-HawkEye+</initrd>
+    <cmdline>console=ttyS0 root=/dev/sda1</cmdline>
+    <boot dev='hd'/>
+  </os>
+```
+
 Refer to `vmconfigs/samples/` for all VM configurations used in the paper.
 
 
@@ -150,33 +152,31 @@ adding the RSA key of the host user to "$HOME/.ssh/authorized_keys" in the guest
 * Add the host and guest user to sudoers; they should be able to execute sudo without entering password.
 An example `/etc/sudoers` entry is shown below:
 ```
-ashish  ALL=(ALL:ALL) NOPASSWD:ALL
+venkat  ALL=(ALL:ALL) NOPASSWD:ALL
 ```
 
-* Edit the ip address and user names of the host machine and VM in `Trident-MICRO21-artifact/scripts/configs.sh`
+* Edit the ip address and user name of the VM in `scripts/configs.sh`
 in the following fields:
 ```
 GUESTUSER
 GUESTIP
-HOSTUSER
-HOSTIP
 ```
 
 * Configure the guest OS to auto mount the `Trident-MICRO21-artifact` repository on every boot in the same path as it is in the host using a network file system. An example `/etc/fstab` entry that uses SSHFS is shown below (assuming that the artifact is placed in the home directory of the user):
 ```
-ashish@10.202.4.119:/home/ashish/Trident-MICRO21-artifact /home/ashish/Trident-MICRO21-artifact fuse.sshfs identityfile=/home/ashish/.ssh/id_rsa,allow_other,default_permissions 0 0
+venkat@10.202.4.119:/home/venkat/Trident-MICRO21-artifact /home/venkat/Trident-MICRO21-artifact fuse.sshfs identityfile=/home/venkat/.ssh/id_rsa,allow_other,default_permissions 0 0
 ```
 
 Preparing Datasets
 ------------------
 
 The `canneal` and `svm` workloads require datasets to run. In addition, scripts to fragment physical memory
-also require two large files. Scripts to download or generate all the required datasets are placed in
-`Trident-MICRO21-artifact/datasets/`. Total disk space required for the datasets = memory size of socket 0 + 25GB.
-Generate datasets (prior to running any experiment)  as:
+also require two large files. Individual scripts to prepare these datasets are placed in `datasets/`. Total disk space
+required for datasets = memory size of socket 0 + 30GB.
+Generate all datasets at once (prior to running any experiment) as:
 
 ```
-$ Trident-MICRO21-artifact/scripts/prep_all_datasets.sh
+$ scripts/prep_all_datasets.sh
 ```
 
 
@@ -186,24 +186,21 @@ Running the Experiments
 Before you start running the experiments, boot your system with Trident (For HawkEye configurations, boot with HawkEye image),
 and edit `configs.sh` as per your setup.
 
-To run all experiments, execute:
-
-```
-$ Trident-MICRO21-artifact/scripts/run_all.sh
-```
-
 To run the experiments for individual figures, do:
 
- * Figure-1 - `Trident-MICRO21-artifact/scripts/run_figure_1.sh`
- * Figure-2 - `Trident-MICRO21-artifact/scripts/run_figure_2.sh`
- * Figure-9 - `Trident-MICRO21-artifact/scripts/run_figure_9.sh`
- * Figure-10 - `Trident-MICRO21-artifact/scripts/run_figure_10.sh`
- * Figure-11 - `Trident-MICRO21-artifact/scripts/run_figure_11.sh`
- * Figure-12 - `Trident-MICRO21-artifact/scripts/run_figure_12.sh`
- * Figure-13 - `Trident-MICRO21-artifact/scripts/run_figure_13.sh`
+ * Figure-1 - `scripts/run_figure_1.sh`
+ * Figure-2 - `scripts/run_figure_2.sh`
+ * Figure-9 - `scripts/run_figure_9.sh`
+ * Figure-10 - `scripts/run_figure_10.sh`
+ * Figure-11 - `scripts/run_figure_11.sh`
+ * Figure-12 - `scripts/run_figure_12.sh`
+ * Figure-13 - `scripts/run_figure_13.sh`
 
 Refer to the corresponding run scripts for the list of supported benchmarks
-and configurations.
+and configurations. Some configurations requires rebooting host system with
+different command-line parameters (`default_hugepagesz=1G` for 1GB Hugetlbfs
+experiments and with HawkEye kernel image for evaluating HawkEye). Wherever
+applicable, follow the steps mentioned in each script to run these configurations.
 
 All output logs will be redirected to `evaluation/`.
 
@@ -215,11 +212,10 @@ When you collected all or partial experimental data, you can compile them
 in CSV format as follows:
 
 ```
-$ Trident-MICRO21-artifact/scripts/compile_report.sh
+$ scripts/compile_report.sh
 ```
 
-CSV files for each figure and table will be redirected to
-`Trident-MICRO21-artifact/report/`.
+CSV files will be redirected to `report/`.
 
 Paper Citation
 --------------
