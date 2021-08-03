@@ -83,6 +83,8 @@ make menuconfig; make -j $(nproc)
 sudo make modules_install; sudo make install
 ```
 
+Enable CONFIG_TRANSPARENT_HUGEPAGE while compiling kernel images.
+
 Install and Create Virtual Machine Configurations
 -------------------------------------------------
 
@@ -173,7 +175,7 @@ Preparing Datasets
 ------------------
 
 The `canneal` and `svm` workloads require datasets to run. In addition, scripts to fragment physical memory
-also require two large files. Individual scripts to prepare these datasets are placed in `datasets/`. Total disk space
+also require two large files. Individual scripts to prepare these datasets are placed in `$PROJECT_DIR/datasets/`. Total disk space
 required for datasets = memory size of socket 0 + 30GB.
 Generate all datasets at once (prior to running any experiment) as:
 
@@ -218,3 +220,8 @@ $PROJECT_DIR/scripts/compile_report.sh
 ```
 
 CSV files will be redirected to `$PROJECT_DIR/report/`.
+
+Paper Citation
+--------------
+
+Venkat Sri Sai Ram, Ashish Panwar and Arkaprava Basu. 2021. Trident: Harnessing Micro-architectural Resources for All Page Sizes in x86 Processors. In Proceedings of the 54th IEEE/ACM International Symposium on Microarchitecture (MICRO-54), Athens, Greece.
