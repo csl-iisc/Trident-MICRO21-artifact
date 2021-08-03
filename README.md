@@ -217,10 +217,3 @@ scripts/compile_report.sh
 ```
 
 CSV files will be redirected to `report/`.
-
-Paper Citation
---------------
-
-Venkat Sai Ram, Ashish Panwar and Arkaprava Basu. 2021. Trident: Harnessing Micro-architectural
-Resources for All Page Sizes in x86 Processors. In Proceedings of the 54th IEEE/ACM International
-Symposium on Microarchitecture (MICRO-54), Athens, Greece.
