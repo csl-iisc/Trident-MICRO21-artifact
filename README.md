@@ -40,7 +40,8 @@ In addition to the packages shipped with Ubuntu 18.04 LTS the following
 packages are required:
 
 ```
-$ sudo apt install build-essential bison bc \
+sudo apt update
+sudo apt install build-essential bison bc \
 		libncurses-dev flex libssl-dev automake \
 		libelf-dev libnuma-dev python3 git \
 		wget libncurses5-dev libevent-dev \
@@ -58,27 +59,27 @@ The source of Trident and HawkEye [ASPLOS'19] kernels are available on GitHub an
 public submodules. To obtain the source code, initialize the git submodules:
 
 ```
-$ cd Trident-MICRO21-artifact
-$ git submodule init
-$ git submodule update
+cd Trident-MICRO21-artifact
+git submodule init
+git submodule update
 ```
 
 To compile Trident, do:
 
 ```
-$ cd sources/Trident
-$ git fetch -all; git checkout trident
-$ make menuconfig; make -j $(nproc)
-$ sudo make modules_install; sudo make install
+cd sources/Trident
+git fetch --all; git checkout trident
+make menuconfig; make -j $(nproc)
+sudo make modules_install; sudo make install
 ```
 
 To compile HawkEye, do:
 
 ```
-$ cd sources/HawkEye;
-$ git fetch -all; git checkout hawkeye
-$ make menuconfig; make -j $(nproc)
-$ sudo make modules_install; sudo make install
+cd sources/HawkEye;
+git fetch --all; git checkout hawkeye
+make menuconfig; make -j $(nproc)
+sudo make modules_install; sudo make install
 ```
 
 Install and Create Virtual Machine Configurations
@@ -87,21 +88,21 @@ Install and Create Virtual Machine Configurations
 Install a virtual machine using command line (choose ssh-server when prompted for package installation):
 
 ```
-$ virt-install --name trident --ram 8192 --disk path=/home/venkat/vms/trident.qcow2,size=60 --vcpus 8 --os-type linux --os-variant generic --network bridge=virbr0 --graphics none --console pty,target_type=serial --location 'http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/' --extra-args 'console=ttyS0,115200n8 serial'
+virt-install --name trident --ram 8192 --disk path=/home/venkat/vms/trident.qcow2,size=60 --vcpus 8 --os-type linux --os-variant generic --network bridge=virbr0 --graphics none --console pty,target_type=serial --location 'http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/' --extra-args 'console=ttyS0,115200n8 serial'
 ```
 Once installed, use the following script to prepare VM configuration files:
 ```
-$ scripts/gen_vmconfigs.py trident
+scripts/gen_vmconfigs.py trident
 
 ```
 If it works well, skip the rest of this subsection. Otherwise you may have to manually create VM configurations following the instructions provided below.
 
 Copy the default XML configuration file in four files under `vmconfigs/`:
 ```
-$ virsh dumpxml trident > Trident-MICRO21-artifact/vmconfigs/4KB.xml
-$ virsh dumpxml trident > Trident-MICRO21-artifact/vmconfigs/2MBHUGE.xml
-$ virsh dumpxml trident > Trident-MICRO21-artifact/vmconfigs/1GBHUGE.xml
-$ virsh dumpxml trident > Trident-MICRO21-artifact/vmconfigs/HAWKEYE.xml
+virsh dumpxml trident > Trident-MICRO21-artifact/vmconfigs/4KB.xml
+virsh dumpxml trident > Trident-MICRO21-artifact/vmconfigs/2MBHUGE.xml
+virsh dumpxml trident > Trident-MICRO21-artifact/vmconfigs/1GBHUGE.xml
+virsh dumpxml trident > Trident-MICRO21-artifact/vmconfigs/HAWKEYE.xml
 ```
 
 Now, update each configuration file to configure the number of vCPUs, memory and NUMA-topology as follows:
@@ -176,7 +177,7 @@ required for datasets = memory size of socket 0 + 30GB.
 Generate all datasets at once (prior to running any experiment) as:
 
 ```
-$ scripts/prep_all_datasets.sh
+scripts/prep_all_datasets.sh
 ```
 
 
@@ -212,7 +213,7 @@ When you collected all or partial experimental data, you can compile them
 in CSV format as follows:
 
 ```
-$ scripts/compile_report.sh
+scripts/compile_report.sh
 ```
 
 CSV files will be redirected to `report/`.
