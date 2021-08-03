@@ -60,6 +60,7 @@ public submodules. To obtain the source code, initialize the git submodules:
 
 ```
 cd Trident-MICRO21-artifact
+PROJECT_DIR=$(pwd)
 git submodule init
 git submodule update
 ```
@@ -67,7 +68,7 @@ git submodule update
 To compile Trident, do:
 
 ```
-cd sources/Trident
+cd $PROJECT_DIR/sources/Trident
 git fetch --all; git checkout trident
 make menuconfig; make -j $(nproc)
 sudo make modules_install; sudo make install
@@ -76,7 +77,7 @@ sudo make modules_install; sudo make install
 To compile HawkEye, do:
 
 ```
-cd sources/HawkEye;
+cd $PROJECT_DIR/sources/HawkEye;
 git fetch --all; git checkout hawkeye
 make menuconfig; make -j $(nproc)
 sudo make modules_install; sudo make install
@@ -92,17 +93,17 @@ virt-install --name trident --ram 8192 --disk path=/home/venkat/vms/trident.qcow
 ```
 Once installed, use the following script to prepare VM configuration files:
 ```
-scripts/gen_vmconfigs.py trident
+$PROJECT_DIR/scripts/gen_vmconfigs.py trident
 
 ```
 If it works well, skip the rest of this subsection. Otherwise you may have to manually create VM configurations following the instructions provided below.
 
 Copy the default XML configuration file in four files under `vmconfigs/`:
 ```
-virsh dumpxml trident > Trident-MICRO21-artifact/vmconfigs/4KB.xml
-virsh dumpxml trident > Trident-MICRO21-artifact/vmconfigs/2MBHUGE.xml
-virsh dumpxml trident > Trident-MICRO21-artifact/vmconfigs/1GBHUGE.xml
-virsh dumpxml trident > Trident-MICRO21-artifact/vmconfigs/HAWKEYE.xml
+virsh dumpxml trident > $PROJECT_DIR/vmconfigs/4KB.xml
+virsh dumpxml trident > $PROJECT_DIR/vmconfigs/2MBHUGE.xml
+virsh dumpxml trident > $PROJECT_DIR/vmconfigs/1GBHUGE.xml
+virsh dumpxml trident > $PROJECT_DIR/vmconfigs/HAWKEYE.xml
 ```
 
 Now, update each configuration file to configure the number of vCPUs, memory and NUMA-topology as follows:
@@ -141,7 +142,7 @@ To boot the VM with HawkEye kernel, add the following "os" tag in `vmconfigs/HAW
   </os>
 ```
 
-Refer to `vmconfigs/samples/` for all VM configurations used in the paper.
+Refer to `$PROJECT_DIR/vmconfigs/samples/` for all VM configurations used in the paper.
 
 
 Additional Settings Post VM Installation
@@ -156,7 +157,7 @@ An example `/etc/sudoers` entry is shown below:
 venkat  ALL=(ALL:ALL) NOPASSWD:ALL
 ```
 
-* Edit the ip address and user name of the VM in `scripts/configs.sh`
+* Edit the ip address and user name of the VM in `$PROJECT_DIR/scripts/configs.sh`
 in the following fields:
 ```
 GUESTUSER
@@ -177,7 +178,7 @@ required for datasets = memory size of socket 0 + 30GB.
 Generate all datasets at once (prior to running any experiment) as:
 
 ```
-scripts/prep_all_datasets.sh
+$PROJECT_DIR/scripts/prep_all_datasets.sh
 ```
 
 
@@ -185,17 +186,17 @@ Running the Experiments
 -----------------------
 
 Before you start running the experiments, boot your system with Trident (For HawkEye configurations, boot with HawkEye image),
-and edit `configs.sh` as per your setup.
+and edit `$PROJECT_DIR/scripts/configs.sh` as per your setup.
 
 To run the experiments for individual figures, do:
 
- * Figure-1 - `scripts/run_figure_1.sh`
- * Figure-2 - `scripts/run_figure_2.sh`
- * Figure-9 - `scripts/run_figure_9.sh`
- * Figure-10 - `scripts/run_figure_10.sh`
- * Figure-11 - `scripts/run_figure_11.sh`
- * Figure-12 - `scripts/run_figure_12.sh`
- * Figure-13 - `scripts/run_figure_13.sh`
+ * Figure-1 - `$PROJECT_DIR/scripts/run_figure_1.sh`
+ * Figure-2 - `$PROJECT_DIR/scripts/run_figure_2.sh`
+ * Figure-9 - `$PROJECT_DIR/scripts/run_figure_9.sh`
+ * Figure-10 - `$PROJECT_DIR/scripts/run_figure_10.sh`
+ * Figure-11 - `$PROJECT_DIR/scripts/run_figure_11.sh`
+ * Figure-12 - `$PROJECT_DIR/scripts/run_figure_12.sh`
+ * Figure-13 - `$PROJECT_DIR/scripts/run_figure_13.sh`
 
 Refer to the corresponding run scripts for the list of supported benchmarks
 and configurations. Some configurations requires rebooting host system with
@@ -203,7 +204,7 @@ different command-line parameters (`default_hugepagesz=1G` for 1GB Hugetlbfs
 experiments and with HawkEye kernel image for evaluating HawkEye). Wherever
 applicable, follow the steps mentioned in each script to run these configurations.
 
-All output logs will be redirected to `evaluation/`.
+All output logs will be redirected to `$PROJECT_DIR/evaluation/`.
 
 
 Prepare the Report
@@ -213,7 +214,7 @@ When you collected all or partial experimental data, you can compile them
 in CSV format as follows:
 
 ```
-scripts/compile_report.sh
+$PROJECT_DIR/scripts/compile_report.sh
 ```
 
-CSV files will be redirected to `report/`.
+CSV files will be redirected to `$PROJECT_DIR/report/`.
