@@ -91,7 +91,11 @@ Install and Create Virtual Machine Configurations
 Install a virtual machine using command line (choose ssh-server when prompted for package installation):
 
 ```
-virt-install --name trident --ram 8192 --disk path=/home/venkat/vms/trident.qcow2,size=60 --vcpus 8 --os-type linux --os-variant generic --network bridge=virbr0 --graphics none --console pty,target_type=serial --location 'http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/' --extra-args 'console=ttyS0,115200n8 serial'
+virt-install --name trident --ram 8192 --disk path=~/trident.qcow2,size=60 \
+--vcpus 8 --os-type linux --os-variant generic --network bridge=virbr0 \
+--graphics none --console pty,target_type=serial \
+--location 'http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/' \
+--extra-args 'console=ttyS0,115200n8 serial'
 ```
 Once installed, use the following script to prepare VM configuration files:
 ```
