@@ -59,6 +59,7 @@ The source of Trident and HawkEye [ASPLOS'19] kernels are available on GitHub an
 public submodules. To obtain the source code, initialize the git submodules:
 
 ```
+git clone https://github.com/csl-iisc/Trident-MICRO21-artifact
 cd Trident-MICRO21-artifact
 PROJECT_DIR=$(pwd)
 git submodule init
