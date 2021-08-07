@@ -42,13 +42,13 @@ packages are required:
 ```
 sudo apt update
 sudo apt install build-essential bison bc \
-		libncurses-dev flex libssl-dev automake \
-		libelf-dev libnuma-dev python3 git \
-		wget libncurses5-dev libevent-dev \
-		libreadline-dev libtool autoconf \
-		qemu-kvm libvirt-bin bridge-utils \
-		virtinst virt-manager hugepages \
-		libgfortran3 libhugetlbfs-dev
+libncurses-dev flex libssl-dev automake \
+libelf-dev libnuma-dev python3 git \
+wget libncurses5-dev libevent-dev \
+libreadline-dev libtool autoconf \
+qemu-kvm libvirt-bin bridge-utils \
+virtinst virt-manager hugepages \
+libgfortran3 libhugetlbfs-dev
 
 ```                       
 
