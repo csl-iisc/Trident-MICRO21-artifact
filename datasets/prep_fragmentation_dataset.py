@@ -15,7 +15,7 @@ def prepare_dataset():
     cmd = 'numactl -H | grep \'node 0 size\' | awk \'{print $4}\''
     total = os.popen(cmd).read().strip()
     total = int(total) * 1024 * 1024
-    print('nr_copies = %d' % (total/sample_size) / 2)
+    print('nr_copies = %d' % ((total/sample_size) / 2))
     nr_copies = int((total/sample_size)/2)
     os.mkdir(os.path.join(root, 'datasets/fragmentation'))
     # --- prepare file-1
