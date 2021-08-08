@@ -171,10 +171,16 @@ GUESTUSER
 GUESTIP
 ```
 
+* Install `sshfs` in the guest:
+```
+sudo apt install sshfs
+```
+
 * Configure the guest OS to auto mount the `Trident-MICRO21-artifact` repository on every boot in the same path as it is in the host using a network file system. An example `/etc/fstab` entry that uses SSHFS is shown below (assuming that the artifact is placed in the home directory of the user):
 ```
 venkat@10.202.4.119:/home/venkat/Trident-MICRO21-artifact /home/venkat/Trident-MICRO21-artifact fuse.sshfs identityfile=/home/venkat/.ssh/id_rsa,allow_other,default_permissions 0 0
 ```
+
 
 Preparing Datasets
 ------------------
