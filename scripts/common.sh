@@ -72,6 +72,7 @@ prepare_paths()
                 echo "Error creating output directory: $RUNDIR"
         fi
         OUTFILE=$RUNDIR/perflog-$BENCHMARK-$(hostname)-$CONFIG.dat
+        LOGFILE=$RUNDIR/runlog-$BENCHMARK-$(hostname)-$CONFIG.log
 }
 
 prepare_args()
@@ -215,7 +216,7 @@ launch_workload()
         fi
         CMD_PREFIX+=" -m $DATA_NODE -c $CPU_NODE "
         LAUNCH_CMD="$CMD_PREFIX $BENCHPATH $BENCH_ARGS"
-        REDIRECT="$COUT"
+        REDIRECT=$LOGFILE
         echo $LAUNCH_CMD
         touch $OUTFILE
         cat /proc/vmstat | egrep 'migrate|th' >> $RUNDIR/vmstat
