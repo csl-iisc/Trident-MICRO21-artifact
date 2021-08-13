@@ -129,6 +129,15 @@ def add_memory_backing(config, main, child):
         page.set('size', '1048576')
         page.set('unit', 'KiB')
 
+def add_cpu_mode(main, child):
+    pos = list(main).index(child)
+    remove_tag(main, 'cpu')
+    cpu = ET.Element('cpu')
+    main.insert(pos + 1, cpu)
+    cpu.set('mode', 'host-passthrough')
+    cpu.set('check', 'partial')
+
+
 
 # -- the following tags are important
 # 1. os: update to booth VM with mitosis kernel
@@ -152,6 +161,8 @@ def rewrite_config(config):
         if child.tag == 'currentMemory':
             child.text = str(get_memory_size(config))
             add_memory_backing(config, main, child)
+        if child.tag == 'cpu':
+            add_cpu_mode(main, child)
 
     tree.write(src)
 
