@@ -227,7 +227,7 @@ launch_workload()
         rm /tmp/alloctest-bench.done &> $COUT
 	echo -1 | sudo tee /proc/sys/kernel/perf_event_paranoid > $COUT
         CMD_PREFIX=$NUMACTL
-        if [ $CONFIG = "2MBHUGE" ] || [ $CONFIG = "1GBHUGE" ]; then
+        if [[ $CONFIG = *HUGE* ]]; then
                 #CMD_PREFIX=" LD_PRELOAD=libhugetlbfs.so HUGETLB_MORECORE=2M $NUMACTL"
                 CMD_PREFIX=" hugectl --heap $NUMACTL"
         fi
