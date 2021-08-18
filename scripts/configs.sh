@@ -12,5 +12,5 @@ FRAG_FILE_1=$ROOT/datasets/fragmentation/file-1
 FRAG_FILE_2=$ROOT/datasets/fragmentation/file-2
 
 # number of hugetlb pages
-HUGETLB_2MB_PAGES=80000
-HUGETLB_1GB_PAGES=160
+HUGETLB_2MB_PAGES=65000
+HUGETLB_1GB_PAGES=130

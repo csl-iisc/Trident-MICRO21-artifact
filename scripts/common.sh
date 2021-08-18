@@ -162,10 +162,22 @@ setup_4kb_configs()
         echo 4096 |  sudo tee /sys/kernel/mm/transparent_hugepage/khugepaged/pages_to_scan > $COUT 2>&1
 }
 
+adjust_hugetlb_pages()
+{
+	if [ $BENCHMARK = "graph500" ]; then
+		HUGETLB_2MB_PAGES=40000
+		HUGETLB_1GB_PAGES=80
+	elif [ $BENCHMARK = "memcached" ]; then
+		HUGETLB_2MB_PAGES=50000
+		HUGETLB_1GB_PAGES=100
+	fi
+}
+
 MBSYSCTL='/sys/devices/system/node/node0/hugepages/hugepages-2048kB/nr_hugepages'
 GBSYSCTL='/sys/devices/system/node/node0/hugepages/hugepages-1048576kB/nr_hugepages'
 prepare_system_configs()
 {
+	adjust_hugetlb_pages
         # --- reserve/drain HUGETLB Pool
 	if [[ $CONFIG = *2MBHUGE* ]]; then
 		echo $HUGETLB_2MB_PAGES | sudo tee $MBSYSCTL > $COUT 2>&1
@@ -278,7 +290,7 @@ shutdown_kvm_vm()
 {
 	echo "Shutting down VM..."
 	ssh $GUESTUSER@$GUESTIP 'sudo shutdown now' > $COUT
-	sleep 5
+	sleep 10
 	virsh destroy $VMIMAGE > $COUT 2>&1
 	sleep 1
 	echo "VM stopped..."
@@ -291,8 +303,8 @@ boot_kvm_vm()
 		echo "error starting vm. Exiting."
 		exit
 	fi
-	echo "VM started....waiting to log in"
-	sleep 90
+	echo "VM started....waiting 150 seconds to log in"
+	sleep 150
 }
 
 prepare_kvm_vm()

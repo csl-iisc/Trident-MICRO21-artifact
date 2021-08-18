@@ -11,8 +11,8 @@ ROOT="$(dirname "$SCRIPTS")"
 source $SCRIPTS/common.sh
 source $SCRIPTS/configs.sh
 
-for BENCHMARK in $BENCHMARKS; do
-	for CONFIG in $CONFIGS; do
+for CONFIG in $CONFIGS; do
+	for BENCHMARK in $BENCHMARKS; do
 		cleanup_system_configs
 		setup_4kb_configs
 		drop_caches
