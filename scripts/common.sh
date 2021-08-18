@@ -273,6 +273,16 @@ launch_workload()
         wait $BENCHMARK_PID 2>$COUT
 }
 
+reserve_kvm_hugetlb_pages()
+{
+	cleanup_system_configs
+	if [[ $CONFIG = *2MBHUGE* ]]; then
+		echo $VM_HUGETLB_2MB_PAGES | sudo tee $MBSYSCTL > $COUT 2>&1
+	elif [[ $CONFIG = *1GBHUGE* ]]; then
+		echo $VM_HUGETLB_1GB_PAGES | sudo tee $GBSYSCTL > $COUT 2>&1
+	fi
+}
+
 copy_vm_config()
 {
 	VMXML=$ROOT/vmconfigs/4KB.xml # -- same XML works for 2MBTHP and HAWKEYE as well
@@ -314,5 +324,6 @@ prepare_kvm_vm()
 {
 	shutdown_kvm_vm
 	copy_vm_config
+	reserve_kvm_hugetlb_pages
 	boot_kvm_vm
 }
