@@ -5,9 +5,10 @@ MEMCACHED_ARGS=" "
 CANNEAL_ARGS=" 1 150000 2000 $ROOT/datasets/canneal_small 7500 "
 XSBENCH_ARGS=" -s XL -t 24 -l 800000000"
 GRAPH500_ARGS=" -s 26 -e 30"
-SVM_ARGS="-- -s 6 -n 36 $ROOT/datasets/kdd12"
+SVM_ARGS="-s 6 -n 36 $ROOT/datasets/kdd12"
 GUPS_ARGS=" 32 5000000 1024"
 GAPBS_ARGS=" -g 29 -n 20 -i 20"
+BC_ARGS=" -g 29 -n 2 -i 2"
 
 # always run on socket-0
 DATA_NODE=0
@@ -90,7 +91,9 @@ prepare_args()
                 BENCH_ARGS=$GRAPH500_ARGS
         elif [ $BENCHMARK = "svm" ]; then
                 BENCH_ARGS=$SVM_ARGS
-        elif [ $BENCHMARK = "pr" ] || [ $BENCHMARK = "cc" ] || [ $BENCHMARK = "bc" ]; then
+        elif [ $BENCHMARK = "bc" ]; then
+                BENCH_ARGS=$BC_ARGS
+        elif [ $BENCHMARK = "pr" ] || [ $BENCHMARK = "cc" ]; then
                 BENCH_ARGS=$GAPBS_ARGS
         fi
 }
@@ -168,8 +171,8 @@ adjust_hugetlb_pages()
 		HUGETLB_2MB_PAGES=40000
 		HUGETLB_1GB_PAGES=80
 	elif [ $BENCHMARK = "memcached" ]; then
-		HUGETLB_2MB_PAGES=50000
-		HUGETLB_1GB_PAGES=100
+		HUGETLB_2MB_PAGES=15000
+		HUGETLB_1GB_PAGES=30
 	fi
 }
 
