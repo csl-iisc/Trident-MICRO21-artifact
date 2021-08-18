@@ -167,7 +167,9 @@ setup_4kb_configs()
 
 adjust_hugetlb_pages()
 {
-	if [ $BENCHMARK = "graph500" ]; then
+	if [ -z $BENCHMARK ]; then
+		return
+	elif [ $BENCHMARK = "graph500" ]; then
 		HUGETLB_2MB_PAGES=40000
 		HUGETLB_1GB_PAGES=80
 	elif [ $BENCHMARK = "memcached" ]; then
