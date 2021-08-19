@@ -8,6 +8,8 @@ GUESTIP=192.168.123.149
 PERF_EVENTS='cycles,dtlb_load_misses.walk_active,dtlb_store_misses.walk_active'
 #PERF_EVENTS='cycles,instructions'
 
+PROFILE_PERF_EVENTS="yes" #no
+
 FRAG_FILE_1=$ROOT/datasets/fragmentation/file-1
 FRAG_FILE_2=$ROOT/datasets/fragmentation/file-2
 

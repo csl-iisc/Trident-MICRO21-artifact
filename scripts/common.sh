@@ -258,8 +258,10 @@ launch_workload()
         fi
         echo -e "Initialization Time (seconds): $INIT_DURATION"
         SECONDS=0
-        $PERF stat -x, -o $OUTFILE --append -e $PERF_EVENTS -p $BENCHMARK_PID &
-        PERF_PID=$!
+	if [ $PROFILE_PERF_EVENTS = "yes" ]; then
+		$PERF stat -x, -o $OUTFILE --append -e $PERF_EVENTS -p $BENCHMARK_PID &
+		PERF_PID=$!
+	fi
         echo -e "\e[0mWaiting for benchmark to be done"
         while [ ! -f /tmp/alloctest-bench.done ]; do
                 sleep 0.1
@@ -269,8 +271,10 @@ launch_workload()
         echo -e "Execution Time (seconds): $DURATION" >> $OUTFILE
         echo -e "Execution Time (seconds): $DURATION"
         echo -e "Initialization Time (seconds): $INIT_DURATION\n" >> $OUTFILE
-        kill -INT $PERF_PID &> $COUT
-        wait $PERF_PID
+	if [ $PROFILE_PERF_EVENTS = "yes" ]; then
+		kill -INT $PERF_PID &> $COUT
+		wait $PERF_PID
+	fi
         cat /proc/vmstat | egrep 'migrate|th' >> $RUNDIR/vmstat
         wait $BENCHMARK_PID 2>$COUT
 }
