@@ -137,7 +137,7 @@ def traverse_benchmark(path):
                 copy = process_perf_log(log)
             else:
                 (time, pwc) = process_perf_log(log)
-        record_output(time, pwc, copy)
+            record_output(time, pwc, copy)
 
 def pretty(name):
     if name in configs:

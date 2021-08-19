@@ -45,7 +45,7 @@ def get_vcpu_count(config):
 # return memory size of a single socket
 def get_memory_size(config):
     mem = int(psutil.virtual_memory().total)/1024 # --- converted to KB
-    return int((mem * 0.80) / nr_sockets) # --- some fraction of total memory
+    return int((mem * 0.85) / nr_sockets) # --- some fraction of total memory
 
 
 # -- host physical bits need to be set for VMs greate than 1TB.
