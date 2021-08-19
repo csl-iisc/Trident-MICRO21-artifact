@@ -211,15 +211,15 @@ def gen_csv_common(dst, benchs, confs, baseline, metric):
 
 def gen_fig1_csv(root):
     out_csv = os.path.join(root, 'report/figure-1a.csv')
-    gen_csv_common(out_csv, workloads, fig1_configs, '4KB', 'time')
-    out_csv = os.path.join(root, 'report/figure-1b.csv')
     gen_csv_common(out_csv, workloads, fig1_configs, '4KB', 'pwc')
+    out_csv = os.path.join(root, 'report/figure-1b.csv')
+    gen_csv_common(out_csv, workloads, fig1_configs, '4KB', 'time')
 
 def gen_fig2_csv(root):
     out_csv = os.path.join(root, 'report/figure-2a.csv')
-    gen_csv_common(out_csv, workloads, fig2_configs, '4KB-4KB', 'time')
-    out_csv = os.path.join(root, 'report/figure-2b.csv')
     gen_csv_common(out_csv, workloads, fig2_configs, '4KB-4KB', 'pwc')
+    out_csv = os.path.join(root, 'report/figure-2b.csv')
+    gen_csv_common(out_csv, workloads, fig2_configs, '4KB-4KB', 'time')
 
 def gen_fig9_csv(root):
     out_csv = os.path.join(root, 'report/figure-9a.csv')
